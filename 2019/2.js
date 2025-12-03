@@ -1,36 +1,49 @@
-const input = Deno.readTextFileSync('2.input').split(',').map(val => +val);
+const TAPE = Deno.readTextFileSync('2.input').split(',').map(val => +val);
+// const TAPE = [1, 0, 0, 0, 99];
 
-const SKIP_4 = 4;
-const INVALID = 1;
+const INSTRUCTIONS = {
+  1: {
+    operation: (tape, address, param1, param2) => {
+      tape[address] = tape[param1] + tape[param2];
+    }
+    ,
+    jump: (IP) => IP + 4
+  },
+  2: {
+    operation: (tape, address, operandA, operandB) => {
+      tape[address] = tape[operandA] * tape[operandB];
+    },
+    jump: (IP) => IP + 4
+  },
+  99: {
+    operation: () => { },
+    jump: (IP, tape) => IP + tape.length
+  }
 
-const readInstruction = ([opcode, operandA, operandB, writeLocation], tape) => {
+};
+const readInstruction = (IP, tape) => {
+  const [opcode, paramA, paramB, address] = tape.slice(IP, IP + 4);
 
-  if (opcode === 1) {
-    tape[writeLocation] = tape[operandA] + tape[operandB];
-    return SKIP_4;
-  }
-  if (opcode === 2) {
-    tape[writeLocation] = tape[operandA] * tape[operandB];
-    return SKIP_4;
-  }
-  if (opcode === 99) {
-    return tape.length;
-  }
-  return INVALID;
+  INSTRUCTIONS[opcode].operation(tape, address, paramA, paramB);
+  return INSTRUCTIONS[opcode].jump(IP, tape);
 };
 
-const computer = (tape, verb, noun) => {
-  tape[1] = noun;
-  tape[2] = verb;
-
+const computer = (tape, noun, verb) => {
   let IP = 0;
+  tape[1] = noun || tape[1];
+  tape[2] = verb || tape[2];
   while (IP < tape.length) {
-    IP += readInstruction(tape.slice(IP, IP + 4), tape);
+    console.log(IP);
+    IP = readInstruction(IP, tape);
   }
-  console.log(tape[0]);
 
   return tape[0];
+  // return tape[0];
 };
+
+// console.log('value is ', computer([...TAPE]));
+// console.log('value is second ', computer([2, 3, 0, 3, 99]));
+// console.log('value is third ', computer([2, 4, 4, 5, 99, 0]));
 
 const t = () => {
   let output = 0;
@@ -38,9 +51,9 @@ const t = () => {
   while (verb <= 99) {
     noun = 0;
     while (noun <= 99) {
-      output = computer([...input], verb, noun);
+      output = computer([...TAPE], noun, verb);
       if (output === 19690720) {
-        return {verb, noun, output};
+        return { verb, noun, output };
       }
       noun++;
     }
@@ -49,4 +62,6 @@ const t = () => {
 
   return 'BANANA';
 };
+
 console.log(t());
+
