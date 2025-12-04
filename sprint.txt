@@ -1,0 +1,7 @@
+ABCDE
+ 1002
+
+DE - two-digit opcode, 02 == opcode 2
+ C - mode of  param 1, 0 == position mode
+ B - mode of  param 2, 1 == immediate mode
+ A - mode of  param 3, 0 == position mode,

@@ -3,16 +3,16 @@ const TAPE = Deno.readTextFileSync('2.input').split(',').map(val => +val);
 
 const INSTRUCTIONS = {
   1: {
-    operation: (tape, address, param1, param2) => {
-      tape[address] = tape[param1] + tape[param2];
-    }
+    operation: (tape, address, param1, param2) =>
+      tape[address] = tape[param1] + tape[param2]
+
     ,
     jump: (IP) => IP + 4
   },
   2: {
-    operation: (tape, address, operandA, operandB) => {
-      tape[address] = tape[operandA] * tape[operandB];
-    },
+    operation: (tape, address, operandA, operandB) =>
+      tape[address] = tape[operandA] * tape[operandB]
+    ,
     jump: (IP) => IP + 4
   },
   99: {
@@ -23,7 +23,6 @@ const INSTRUCTIONS = {
 };
 const readInstruction = (IP, tape) => {
   const [opcode, paramA, paramB, address] = tape.slice(IP, IP + 4);
-
   INSTRUCTIONS[opcode].operation(tape, address, paramA, paramB);
   return INSTRUCTIONS[opcode].jump(IP, tape);
 };
@@ -33,12 +32,11 @@ const computer = (tape, noun, verb) => {
   tape[1] = noun || tape[1];
   tape[2] = verb || tape[2];
   while (IP < tape.length) {
-    console.log(IP);
+    // console.log(IP);
     IP = readInstruction(IP, tape);
   }
 
   return tape[0];
-  // return tape[0];
 };
 
 // console.log('value is ', computer([...TAPE]));
