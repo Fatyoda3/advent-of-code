@@ -6,6 +6,7 @@ const INSTRUCTIONS = {
     operation: (tape, p1Add, p2Add, p3Add) => {
       const param1 = tape[p1Add];
       const param2 = tape[p2Add];
+
       tape[p3Add] = param1 + param2;
     },
     jump: (IP) => IP + 4
@@ -131,12 +132,14 @@ const computer = (tape) => {
 // const tape2 = [1002, 4, 3, 4, 33];
 // const tape3 = [1, 9, 10, 3, 2, 3, 11, 0, 99, 30, 40, 50];
 
-// const tape = [1101, 100, -1, 4, 0];
-// computer(tape);
+const tape = [1101, 100, -1, 4, 0];
+computer(tape);
+console.log(tape);
+
 // computer(tape1);
 // computer(tape2);
 // computer(tape3);
-computer(input);
+// computer(input);
 // computer([3, 9, 7, 9, 10, 9, 4, 9, 99, - 1, 8]);
 // computer([3, 3, 1108, -1, 8, 3, 4, 3, 99]);
 // computer([3, 3, 1107, -1, 8, 3, 4, 3, 99]);

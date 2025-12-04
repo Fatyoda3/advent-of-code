@@ -5,7 +5,6 @@ const INSTRUCTIONS = {
   1: {
     operation: (tape, address, param1, param2) =>
       tape[address] = tape[param1] + tape[param2]
-
     ,
     jump: (IP) => IP + 4
   },
