@@ -33,8 +33,7 @@ const INSTRUCTIONS = {
   '04': {
     operation: (tape, memoryAddressToRead) => {
       cold_store.push({
-        [memoryAddressToRead]:
-          tape[memoryAddressToRead]
+        [memoryAddressToRead]: tape[memoryAddressToRead]
       });
       console.log('value read is : ');
       console.log(tape[memoryAddressToRead]);
