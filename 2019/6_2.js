@@ -1,10 +1,10 @@
-const pathMap = "COM)B,B)C,C)D,D)E,E)F,B)G,G)H,D)I,E)J,J)K,K)L,K)YOU,I)SAN"
-  .split(',')
-  .map(value => value.split(')'));
-// const pathMap = Deno.readTextFileSync('6.input')
-//   .split('\n')
-//   .map((value) => value.split(')'));
-
+// const pathMap = "COM)B,B)C,C)D,D)E,E)F,B)G,G)H,D)I,E)J,J)K,K)L,K)YOU,I)SAN"
+//   .split(',')
+//   .map(value => value.split(')'));
+const pathMap = Deno.readTextFileSync('6.input')
+  .split('\n')
+  .map((value) => value.split(')'));
+//442
 const map = {};
 function mapOrbiters() {
 
@@ -21,59 +21,53 @@ function mapOrbiters() {
       map[orbiter] = { orbiters: [] };
     }
   }
-
 }
+
 const path1 = [];
 const path2 = [];
 
 let flag = false;
+const hasChild = (map, head, traverseTo) => {
+  const children = map[head].orbiters;
+  if (children.includes(traverseTo)) {
 
-const traverseOrbiters = (head = 'COM', traverseTo, path) => {
-  if (map[head].orbiters.includes(traverseTo)) {
-    flag = true;
-    return;
+    return true;
   }
-
-  // 442
-
-  while (head !== undefined) {
-    const orbiters = map[head].orbiters;
-    if (orbiters.length === 0) {
-      return;
-    }
-
-    path.push(head);
-    
-    orbiters.forEach(orbiter => {
-      count += 1;
-      head = traverseOrbiters(orbiter, traverseTo, path);
-      if (flag) return;
-    });
-
-  }
-
-  return head;
+  return children
+    .some((each) => hasChild(map, each, traverseTo));
 };
 
-let count = 0;
+const traverseOrbiters = (head, traverseTo) => {
+  if (map[head].orbiters.includes(traverseTo)) {
+    return 0;
+  }
+  const orbiter = map[head]
+    .orbiters
+    .find(each => hasChild(map, each, traverseTo));
+
+  return 1 + traverseOrbiters(orbiter, traverseTo);
+};
+
 const main = () => {
   mapOrbiters();
 
-  traverseOrbiters('COM', 'YOU', path1);
-  flag = false;
-  traverseOrbiters('COM', 'SAN', path2);
-
+  let min = Infinity;
   for (const key in map) {
-    traverseOrbiters(key, '', []);
+
+    if (hasChild(map, key, 'SAN') && hasChild(map, key, 'YOU')) {
+      const distanceBetween = traverseOrbiters(key, 'SAN');
+      const distanceBetween2 = traverseOrbiters(key, 'YOU');
+      const totalDistance = distanceBetween + distanceBetween2;
+      if (min > totalDistance) {
+        min = totalDistance;
+      }
+    }
+
   }
 
-  console.log('you path', path1);
-  console.log('santa path', path2);
 
-  console.log(map);
+  console.log(min);
 
-  console.log({ count });
 };
-// console.log({ f });
 
 main();

@@ -14,6 +14,7 @@ function mapOrbiters() {
 
     if (map[currentPlanet] === undefined) {
       map[currentPlanet] = { orbiters: [orbiter] };
+
     } else {
       map[currentPlanet].orbiters.push(orbiter);
     }
