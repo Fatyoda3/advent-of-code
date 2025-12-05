@@ -16,6 +16,18 @@ const MULTIPLY = {
   },
   jump: (IP) => IP + 4
 };
+const EQUALITY = {
+  operation: (tape, p1Add, p2Add, p3Add) => {
+    if (tape[p1Add] === tape[p2Add]) {
+      tape[p3Add] = 1;
+    } else {
+      tape[p3Add] = 0;
+    }
+  },
+
+  jump: (IP) => IP + 4
+
+};
 const inputCombos = [[4, 3, 2, 1, 0]];
 const programData = [
   3, 15, 3, 16,
@@ -33,7 +45,7 @@ let cycleSecondInput = 0;
 const INSTRUCTIONS = {
   '01': ADD,
   '02': MULTIPLY,
-  '03': /* input */ {
+  '03': {
     operation: (tape, writeAddress, firstInput, remaining) => {
       const input1 = firstInput.shift();
       if (input1 !== undefined) {
@@ -62,18 +74,7 @@ const INSTRUCTIONS = {
     jump: (IP) => IP + 2
 
   },
-  '08': /* equals operator */{
-    operation: (tape, p1Add, p2Add, p3Add) => {
-      if (tape[p1Add] === tape[p2Add]) {
-        tape[p3Add] = 1;
-      } else {
-        tape[p3Add] = 0;
-      }
-    },
-
-    jump: (IP) => IP + 4
-
-  },
+  '08': /* equals operator */EQUALITY,
   '07': /* less than operator */{
     operation: (tape, p1Add, p2Add, p3Add) => {
       if (tape[p1Add] < tape[p2Add]) {
