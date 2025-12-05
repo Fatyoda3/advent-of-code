@@ -114,6 +114,6 @@ for (let index = 0; index < inputCombos.length; index++) {
   thrustValues.push(cold_store.pop());
 }
 
-const swissCheese = 43210;
+const thrustNeeded = 43210;
 const maxThrust = thrustValues.reduce((max, current) => Math.max(max, current), 0);
-console.log(`swiss cheese must be |${swissCheese}| and it is now at |${maxThrust}|`);
+console.log(`Thrust should |${thrustNeeded}| and it\'s now |${maxThrust}|`);
