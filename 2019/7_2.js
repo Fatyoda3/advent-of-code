@@ -60,24 +60,26 @@ const MODE_BIT = {
   1: (memPtr) => memPtr,
   0: (memPtr, tape) => tape[memPtr]
 };
-const getParameterValue = (mode, currMemPtr, memory) => MODE_BIT[mode](currMemPtr, memory);
-const executeInstruction = (memPtr, memory, firstInput, remaining) => {
+const getParams = ([m1, m2, m3], memPtr, memory) => {
+  return [MODE_BIT[m1](memPtr + 1, memory),
+  MODE_BIT[m2](memPtr + 2, memory),
+  MODE_BIT[m3](memPtr + 3, memory)];
+};
+const formatInstruction = (memory, memPtr) => {
   const instruction = `${memory[memPtr]}`.padStart(5, '0');
-  const [p3Mode, p2Mode, p1Mode, ...code] = [...instruction];
-  let offset = 0;
+  return instruction;
+};
+const getParamsAndOpcode = (memory, memPtr) => {
+  const [p3Mod, p2Mod, p1Mod, ...code] = formatInstruction(memory, memPtr);
+  const [p1, p2, p3] = getParams([p1Mod, p2Mod, p3Mod], memPtr, memory);
+  return [p1, p2, p3, code.join("")];
+};
 
-  const param1Value = getParameterValue(p1Mode, memPtr + (++offset), memory);
-  const param2Value = getParameterValue(p2Mode, memPtr + (++offset), memory);
-  const param3Value = MODE_BIT[p3Mode](memPtr + (++offset), memory);
+const executeInstruction = (memPtr, memory, firstInput, remaining) => {
+  const [p1, p2, p3, opcode] = getParamsAndOpcode(memory, memPtr);
+  const passInputs = opcode === '03' ? [firstInput, remaining] : [p2, p3];
 
-  const opcode = code.join("");
-  let passInputs = [param2Value, param3Value];
-
-  if (opcode === '03') {
-    passInputs = [firstInput, remaining];
-
-  }
-  const skipJump = INSTRUCTIONS[opcode].operation(memory, param1Value, ...passInputs, memPtr);
+  const skipJump = INSTRUCTIONS[opcode].operation(memory, p1, ...passInputs, memPtr);
 
   return skipJump || INSTRUCTIONS[opcode].jump(memPtr, memory);
 };
