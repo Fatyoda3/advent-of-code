@@ -7,16 +7,6 @@ import {
   MULTIPLY,
   HALT
 } from "./7_INS.js";
-
-const inputCombos = [[4, 3, 2, 1, 0]];
-
-const programData = [
-  3, 15, 3, 16,
-  1002, 16, 10,
-  16, 1, 16,
-  15, 15, 4,
-  15, 99, 0, 0];
-
 const INPUTS = [];
 const cold_store = [];
 
@@ -70,22 +60,24 @@ const MODE_BIT = {
   1: (memPtr) => memPtr,
   0: (memPtr, tape) => tape[memPtr]
 };
-
+const getParameterValue = (mode, currMemPtr, memory) => MODE_BIT[mode](currMemPtr, memory);
 const executeInstruction = (memPtr, memory, firstInput, remaining) => {
   const instruction = `${memory[memPtr]}`.padStart(5, '0');
   const [p3Mode, p2Mode, p1Mode, ...code] = [...instruction];
+  let offset = 0;
 
-  const p1 = MODE_BIT[p1Mode](memPtr + 1, memory);
-  const p2 = MODE_BIT[p2Mode](memPtr + 2, memory);
-  const memoryToWriteAt = MODE_BIT[p3Mode](memPtr + 3, memory);
+  const param1Value = getParameterValue(p1Mode, memPtr + (++offset), memory);
+  const param2Value = getParameterValue(p2Mode, memPtr + (++offset), memory);
+  const param3Value = MODE_BIT[p3Mode](memPtr + (++offset), memory);
 
   const opcode = code.join("");
-  let passInputs = [p2, memoryToWriteAt];
+  let passInputs = [param2Value, param3Value];
 
-  if (opcode === '03')
+  if (opcode === '03') {
     passInputs = [firstInput, remaining];
 
-  const skipJump = INSTRUCTIONS[opcode].operation(memory, p1, ...passInputs, memPtr);
+  }
+  const skipJump = INSTRUCTIONS[opcode].operation(memory, param1Value, ...passInputs, memPtr);
 
   return skipJump || INSTRUCTIONS[opcode].jump(memPtr, memory);
 };
@@ -99,6 +91,14 @@ const computer = (tape, firstInput, remaining) => {
 };
 
 const generatePartedInput = (inputSet) => [[inputSet[0], 0], inputSet.slice(1)];
+const inputCombos = [[4, 3, 2, 1, 0]];
+
+const programData = [
+  3, 15, 3, 16,
+  1002, 16, 10,
+  16, 1, 16,
+  15, 15, 4,
+  15, 99, 0, 0];
 const thrustValues = [];
 
 for (let index = 0; index < inputCombos.length; index++) {
@@ -115,5 +115,8 @@ for (let index = 0; index < inputCombos.length; index++) {
 }
 
 const thrustNeeded = 43210;
-const maxThrust = thrustValues.reduce((max, current) => Math.max(max, current), 0);
-console.log(`Thrust should |${thrustNeeded}| and it\'s now |${maxThrust}|`);
+const maxThrust = Math.max(...thrustValues);
+
+console.log(
+  `Thrust should |${thrustNeeded}|-it\'s now|${maxThrust}|`
+  , thrustNeeded === maxThrust);
