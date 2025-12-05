@@ -23,35 +23,40 @@ const cold_store = [];
 let writeCount = 1;
 let cycleSecondInput = 0;
 
-const INSTRUCTIONS = {
-  '03': {
-    operation: (tape, writeAddress, firstInput, remaining) => {
-      const input1 = firstInput.shift();
-      if (input1 !== undefined) {
-        tape[writeAddress] = input1;
-        INPUTS.push(tape[writeAddress]);
-        return;
-      }
-      if (cold_store.length === 1 && writeCount === 2) {
-        writeCount = 1;
-        const secondInput = cold_store.pop();
-        tape[writeAddress] = secondInput;
-        return;
-      }
-      tape[writeAddress] = remaining[cycleSecondInput++];
+const INPUT = {
+  operation: (tape, writeAddress, firstInput, remaining) => {
+    const input1 = firstInput.shift();
+    if (input1 !== undefined) {
+      tape[writeAddress] = input1;
       INPUTS.push(tape[writeAddress]);
-      writeCount += 1;
-    },
+      return;
+    }
+    if (cold_store.length === 1 && writeCount === 2) {
+      writeCount = 1;
+      const secondInput = cold_store.pop();
+      tape[writeAddress] = secondInput;
+      return;
+    }
 
-    jump: (IP) => IP + 2
-  },
-  '04': {
-    operation: (tape, memoryAddressToRead) => {
-      cold_store.push(tape[memoryAddressToRead]);
-    },
+    tape[writeAddress] = remaining[cycleSecondInput++];
+    INPUTS.push(tape[writeAddress]);
+    writeCount += 1;
 
-    jump: (IP) => IP + 2
   },
+
+  jump: (IP) => IP + 2
+};
+
+const OUTPUT = {
+  operation: (tape, memoryAddressToRead) => {
+    cold_store.push(tape[memoryAddressToRead]);
+  },
+
+  jump: (IP) => IP + 2
+};
+const INSTRUCTIONS = {
+  '03': INPUT,
+  '04': OUTPUT,
 
   '01': ADD,
   '02': MULTIPLY,
@@ -61,27 +66,28 @@ const INSTRUCTIONS = {
   '08': EQUALITY,
   '99': HALT
 };
-const SWITCH_MODE = {
-  1: (_, memPtr) => memPtr,
-  0: (tape, value) => tape[value]
+const MODE_BIT = {
+  1: (memPtr) => memPtr,
+  0: (memPtr, tape) => tape[memPtr]
 };
 
-const executeInstruction = (pointer, tape, firstInput, remaining) => {
-  const ins = `${tape[pointer]}`.padStart(5, '0');
+const executeInstruction = (memPtr, memory, firstInput, remaining) => {
+  const instruction = `${memory[memPtr]}`.padStart(5, '0');
+  const [p3Mode, p2Mode, p1Mode, ...code] = [...instruction];
 
-  const [p3Mode, p2Mode, p1Mode, ...code] = [...ins];
-  const p1 = SWITCH_MODE[p1Mode](tape, pointer + 1);
-  const p2 = SWITCH_MODE[p2Mode](tape, pointer + 2);
-  const memoryToWriteAt = SWITCH_MODE[p3Mode](tape, pointer + 3);
+  const p1 = MODE_BIT[p1Mode](memPtr + 1, memory);
+  const p2 = MODE_BIT[p2Mode](memPtr + 2, memory);
+  const memoryToWriteAt = MODE_BIT[p3Mode](memPtr + 3, memory);
 
   const opcode = code.join("");
   let passInputs = [p2, memoryToWriteAt];
 
   if (opcode === '03')
     passInputs = [firstInput, remaining];
-  const skipJump = INSTRUCTIONS[opcode].operation(tape, p1, ...passInputs, pointer);
 
-  return skipJump || INSTRUCTIONS[opcode].jump(pointer, tape);
+  const skipJump = INSTRUCTIONS[opcode].operation(memory, p1, ...passInputs, memPtr);
+
+  return skipJump || INSTRUCTIONS[opcode].jump(memPtr, memory);
 };
 
 const computer = (tape, firstInput, remaining) => {
