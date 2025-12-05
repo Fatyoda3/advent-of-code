@@ -36,7 +36,6 @@ const INPUT = {
 
   jump: (IP) => IP + 2
 };
-
 const OUTPUT = {
   operation: (tape, memoryAddressToRead) => {
     cold_store.push(tape[memoryAddressToRead]);
@@ -44,6 +43,7 @@ const OUTPUT = {
 
   jump: (IP) => IP + 2
 };
+
 const INSTRUCTIONS = {
   '03': INPUT,
   '04': OUTPUT,
@@ -60,6 +60,7 @@ const MODE_BIT = {
   1: (memPtr) => memPtr,
   0: (memPtr, tape) => tape[memPtr]
 };
+
 const getParams = ([m1, m2, m3], memPtr, memory) => {
   return [MODE_BIT[m1](memPtr + 1, memory),
   MODE_BIT[m2](memPtr + 2, memory),
