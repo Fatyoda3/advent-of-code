@@ -1,4 +1,3 @@
-//4,3,2,1,0
 import { permutations } from "./array.js";
 const input_store = [];
 const cold_store = [];

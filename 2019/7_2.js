@@ -1,6 +1,29 @@
-//4,3,2,1,0
-import { permutations } from "./array.js";
-import { tape } from "./array_7.js";
+const ADD = {
+  operation: (tape, address1, address2, writeAt) => {
+    const param1 = tape[address1];
+    const param2 = tape[address2];
+
+    tape[writeAt] = param1 + param2;
+  },
+  jump: (IP) => IP + 4
+};
+const MULTIPLY = {
+  operation: (tape, address1, address2, writeAt) => {
+    const param1 = tape[address1];
+    const param2 = tape[address2];
+
+    tape[writeAt] = param1 * param2;
+  },
+  jump: (IP) => IP + 4
+};
+const inputCombos = [[4, 3, 2, 1, 0]];
+const programData = [
+  3, 15, 3, 16,
+  1002, 16, 10,
+  16, 1, 16,
+  15, 15, 4,
+  15, 99, 0, 0];
+
 const INPUTS = [];
 const cold_store = [];
 
@@ -8,46 +31,24 @@ let writeCount = 1;
 let cycleSecondInput = 0;
 
 const INSTRUCTIONS = {
-  '01': /* add */{
-    operation: (tape, p1Add, p2Add, p3Add) => {
-      const param1 = tape[p1Add];
-      const param2 = tape[p2Add];
-
-      tape[p3Add] = param1 + param2;
-    },
-    jump: (IP) => IP + 4
-  },
-  '02':/* multiply */ {
-    operation: (tape, p1Add, p2Add, p3Add) => {
-      const param1 = tape[p1Add];
-      const param2 = tape[p2Add];
-
-      tape[p3Add] = param1 * param2;
-    },
-    jump: (IP) => IP + 4
-  },
-  '03': /* input data */{
-    operation: (tape, writeTo, firstInput, remaining) => {
+  '01': ADD,
+  '02': MULTIPLY,
+  '03': /* input */ {
+    operation: (tape, writeAddress, firstInput, remaining) => {
       const input1 = firstInput.shift();
       if (input1 !== undefined) {
-        tape[writeTo] = input1;
-        INPUTS.push(tape[writeTo]);
-        // console.log('input array mechanism\n', writeTo, { input_store });
+        tape[writeAddress] = input1;
+        INPUTS.push(tape[writeAddress]);
         return;
       }
       if (cold_store.length === 1 && writeCount === 2) {
         writeCount = 1;
         const secondInput = cold_store.pop();
-        tape[writeTo] = secondInput;
-        // console.log('inside to test the input array mechanism\n',
-        //   secondInput,
-        //   cold_store,
-        //   { input_store });
+        tape[writeAddress] = secondInput;
         return;
       }
-      tape[writeTo] = remaining[cycleSecondInput++]/* +(prompt("enter the value to put at :" + writeTo)) */;
-      INPUTS.push(tape[writeTo]);
-      // console.log({ input_store });
+      tape[writeAddress] = remaining[cycleSecondInput++];
+      INPUTS.push(tape[writeAddress]);
       writeCount += 1;
     },
 
@@ -56,10 +57,6 @@ const INSTRUCTIONS = {
   '04': /* output */{
     operation: (tape, memoryAddressToRead) => {
       cold_store.push(tape[memoryAddressToRead]);
-      // console.log('value read is : ');
-      // console.log(tape[memoryAddressToRead]);
-      // console.log({ output: cold_store });
-
     },
 
     jump: (IP) => IP + 2
@@ -98,7 +95,7 @@ const INSTRUCTIONS = {
     jump: (IP) => IP + 3
 
   },
-  '06': /* jump if not-zero operator */{
+  '06': /* jump if zero operator */{
     operation: (tape, p1Add, p2Add, _) => {
       if (tape[p1Add] === 0) {
         return tape[p2Add];
@@ -117,7 +114,7 @@ const SWITCH_MODE = {
   0: (tape, value) => tape[value]
 };
 
-const readInstruction = (pointer, tape, firstInput, remaining) => {
+const executeInstruction = (pointer, tape, firstInput, remaining) => {
   const ins = `${tape[pointer]}`.padStart(5, '0');
 
   const [p3Mode, p2Mode, p1Mode, ...code] = [...ins];
@@ -138,7 +135,7 @@ const readInstruction = (pointer, tape, firstInput, remaining) => {
 const computer = (tape, firstInput, remaining) => {
   let pointer = 0;
   while (pointer < tape.length) {
-    pointer = readInstruction(pointer, tape, firstInput, remaining);
+    pointer = executeInstruction(pointer, tape, firstInput, remaining);
   }
   return tape;
 };
@@ -146,19 +143,19 @@ const computer = (tape, firstInput, remaining) => {
 const generatePartedInput = (inputSet) => [[inputSet[0], 0], inputSet.slice(1)];
 const thrustValues = [];
 
-for (let index = 0; index < permutations.length; index++) {
-  const [firstInput, remaining] = generatePartedInput(permutations[index]);
+for (let index = 0; index < inputCombos.length; index++) {
+  const [firstInput, remaining] = generatePartedInput(inputCombos[index]);
 
-  computer([...tape], firstInput, remaining);
-  computer([...tape], firstInput, remaining);
-  computer([...tape], firstInput, remaining);
-  computer([...tape], firstInput, remaining);
-  computer([...tape], firstInput, remaining);
+  computer([...programData], firstInput, remaining);
+  computer([...programData], firstInput, remaining);
+  computer([...programData], firstInput, remaining);
+  computer([...programData], firstInput, remaining);
+  computer([...programData], firstInput, remaining);
 
   cycleSecondInput = 0;
   thrustValues.push(cold_store.pop());
 }
-console.log(thrustValues);
-console.log('swiss cheese',
-  thrustValues.reduce((max, current) => Math.max(max, current), 0));
 
+const swissCheese = 43210;
+const maxThrust = thrustValues.reduce((max, current) => Math.max(max, current), 0);
+console.log(`swiss cheese must be |${swissCheese}| and it is now at |${maxThrust}|`);
