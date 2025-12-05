@@ -28,6 +28,36 @@ const EQUALITY = {
   jump: (IP) => IP + 4
 
 };
+const LESS_THAN = {
+  operation: (tape, p1Add, p2Add, p3Add) => {
+    if (tape[p1Add] < tape[p2Add]) {
+      tape[p3Add] = 1;
+    } else {
+      tape[p3Add] = 0;
+    }
+  },
+
+  jump: (IP) => IP + 4
+
+};
+const JUMP_IF_NOT_0 = {
+  operation: (tape, p1Add, p2Add, _) => {
+    if (tape[p1Add] !== 0) {
+      return tape[p2Add];
+    }
+  },
+  jump: (IP) => IP + 3
+
+};
+const JUMP_IF_0 = {
+  operation: (tape, p1Add, p2Add, _) => {
+    if (tape[p1Add] === 0) {
+      return tape[p2Add];
+    }
+  },
+  jump: (IP) => IP + 3
+
+};
 const inputCombos = [[4, 3, 2, 1, 0]];
 const programData = [
   3, 15, 3, 16,
@@ -66,45 +96,17 @@ const INSTRUCTIONS = {
 
     jump: (IP) => IP + 2
   },
-  '04': /* output */{
+  '04': {
     operation: (tape, memoryAddressToRead) => {
       cold_store.push(tape[memoryAddressToRead]);
     },
 
     jump: (IP) => IP + 2
-
   },
-  '08': /* equals operator */EQUALITY,
-  '07': /* less than operator */{
-    operation: (tape, p1Add, p2Add, p3Add) => {
-      if (tape[p1Add] < tape[p2Add]) {
-        tape[p3Add] = 1;
-      } else {
-        tape[p3Add] = 0;
-      }
-    },
-
-    jump: (IP) => IP + 4
-
-  },
-  '05': /* jump if not-zero operator */{
-    operation: (tape, p1Add, p2Add, _) => {
-      if (tape[p1Add] !== 0) {
-        return tape[p2Add];
-      }
-    },
-    jump: (IP) => IP + 3
-
-  },
-  '06': /* jump if zero operator */{
-    operation: (tape, p1Add, p2Add, _) => {
-      if (tape[p1Add] === 0) {
-        return tape[p2Add];
-      }
-    },
-    jump: (IP) => IP + 3
-
-  },
+  '08': EQUALITY,
+  '07': LESS_THAN,
+  '05': JUMP_IF_NOT_0,
+  '06': JUMP_IF_0,
   '99':/* HALT */ {
     operation: () => { },
     jump: (IP, tape) => IP + tape.length
