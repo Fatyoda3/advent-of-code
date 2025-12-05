@@ -23,10 +23,6 @@ function mapOrbiters() {
   }
 }
 
-const path1 = [];
-const path2 = [];
-
-let flag = false;
 const hasChild = (map, head, traverseTo) => {
   const children = map[head].orbiters;
   if (children.includes(traverseTo)) {
@@ -41,9 +37,8 @@ const traverseOrbiters = (head, traverseTo) => {
   if (map[head].orbiters.includes(traverseTo)) {
     return 0;
   }
-  const orbiter = map[head]
-    .orbiters
-    .find(each => hasChild(map, each, traverseTo));
+  const orbiter = map[head].orbiters
+    .find(orbiter => hasChild(map, orbiter, traverseTo));
 
   return 1 + traverseOrbiters(orbiter, traverseTo);
 };
@@ -57,7 +52,9 @@ const main = () => {
     if (hasChild(map, key, 'SAN') && hasChild(map, key, 'YOU')) {
       const distanceBetween = traverseOrbiters(key, 'SAN');
       const distanceBetween2 = traverseOrbiters(key, 'YOU');
+     
       const totalDistance = distanceBetween + distanceBetween2;
+     
       if (min > totalDistance) {
         min = totalDistance;
       }

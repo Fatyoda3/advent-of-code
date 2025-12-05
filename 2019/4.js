@@ -13,7 +13,6 @@ const checkIfValid = (number) => {
   let partiallyFormed = str[0];
 
   const continuousMatches = [];
-
   for (let index = 1; index < str.length; index++) {
     const current = str[index];
 

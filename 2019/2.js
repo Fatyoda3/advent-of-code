@@ -1,5 +1,5 @@
-const TAPE = Deno.readTextFileSync('2.input').split(',').map(val => +val);
-// const TAPE = [1, 0, 0, 0, 99];
+// const TAPE = Deno.readTextFileSync('2.input').split(',').map(val => +val);
+const TAPE = [1, 0, 0, 0, 99];
 
 const INSTRUCTIONS = {
   1: {
@@ -31,29 +31,38 @@ const computer = (tape, noun, verb) => {
   tape[1] = noun || tape[1];
   tape[2] = verb || tape[2];
   while (IP < tape.length) {
-    // console.log(IP);
     IP = readInstruction(IP, tape);
   }
 
   return tape[0];
 };
 
-// console.log('value is ', computer([...TAPE]));
-// console.log('value is second ', computer([2, 3, 0, 3, 99]));
-// console.log('value is third ', computer([2, 4, 4, 5, 99, 0]));
+const TARGET = 19690720;
 
 const t = () => {
   let output = 0;
-  let [verb, noun] = [0, 0];
+  let [verb, mid] = [0, 0];
   while (verb <= 99) {
-    noun = 0;
-    while (noun <= 99) {
-      output = computer([...TAPE], noun, verb);
-      if (output === 19690720) {
-        return { verb, noun, output };
+    // let low = 0;
+    // let high = 73;
+
+    while (/* low <= high */mid <= 99) {
+      // mid = Math.floor((low + mid) / 2);
+      // console.log(mid);
+
+      output = computer([...TAPE], mid, verb);
+      if (output === TARGET) {
+        return { verb, noun: mid, output };
       }
-      noun++;
+      // if (output > TARGET) {
+      //   high = mid - 1;
+      // }
+      // else {
+      //   low = mid + 1;
+      // }
+      mid++;
     }
+
     verb++;
   }
 

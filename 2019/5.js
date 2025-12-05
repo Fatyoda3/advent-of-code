@@ -70,7 +70,7 @@ const INSTRUCTIONS = {
   },
 
   '05': /* jump if not-zero operator */{
-    operation: (tape, p1Add, p2Add, _, pointer) => {
+    operation: (tape, p1Add, p2Add, _) => {
       if (tape[p1Add] !== 0) {
         return tape[p2Add];
       }
@@ -79,7 +79,7 @@ const INSTRUCTIONS = {
 
   },
   '06': /* jump if not-zero operator */{
-    operation: (tape, p1Add, p2Add, _, pointer) => {
+    operation: (tape, p1Add, p2Add, _) => {
       if (tape[p1Add] === 0) {
         return tape[p2Add];
       }

@@ -11,10 +11,12 @@ const swap = (arr, a, b) => {
   arr[b] = temp;
 };
 let count = 0;
+const permutations = [];
 const permutateValues = (nItems, collection) => {
 
   if (nItems === 1) {
     console.log({ A: collection });
+    permutations.push([...collection]);
     return collection;
   } else {
     permutateValues(nItems - 1, collection);
@@ -30,8 +32,17 @@ const permutateValues = (nItems, collection) => {
   }
 };
 
-permutateValues(3, [ 1, 2, 3]);
-console.log(count);
+permutateValues(5, [0, 1, 2, 3, 4]);
+// console.log('c', permutations);
+// console.log(permutations.join(' '));
+const str = ['['];
+for (const permutation of permutations) {
+  console.log(permutation);
+  // str.push(permutation.toString());
+}
+// console.log(str);
+
+// console.log(count);
 
 //123
 //213
