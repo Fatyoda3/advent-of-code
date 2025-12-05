@@ -58,7 +58,10 @@ const JUMP_IF_0 = {
   jump: (IP) => IP + 3
 
 };
-
+const HALT = {
+  operation: () => { },
+  jump: (IP, tape) => IP + tape.length
+};
 export {
   JUMP_IF_0,
   JUMP_IF_NOT_0,
@@ -66,4 +69,5 @@ export {
   EQUALITY,
   ADD,
   MULTIPLY,
+  HALT
 };

@@ -5,8 +5,11 @@ import {
   EQUALITY,
   ADD,
   MULTIPLY,
+  HALT
 } from "./7_INS.js";
+
 const inputCombos = [[4, 3, 2, 1, 0]];
+
 const programData = [
   3, 15, 3, 16,
   1002, 16, 10,
@@ -21,8 +24,6 @@ let writeCount = 1;
 let cycleSecondInput = 0;
 
 const INSTRUCTIONS = {
-  '01': ADD,
-  '02': MULTIPLY,
   '03': {
     operation: (tape, writeAddress, firstInput, remaining) => {
       const input1 = firstInput.shift();
@@ -51,14 +52,14 @@ const INSTRUCTIONS = {
 
     jump: (IP) => IP + 2
   },
-  '08': EQUALITY,
-  '07': LESS_THAN,
+
+  '01': ADD,
+  '02': MULTIPLY,
   '05': JUMP_IF_NOT_0,
   '06': JUMP_IF_0,
-  '99':/* HALT */ {
-    operation: () => { },
-    jump: (IP, tape) => IP + tape.length
-  }
+  '07': LESS_THAN,
+  '08': EQUALITY,
+  '99': HALT
 };
 const SWITCH_MODE = {
   1: (_, memPtr) => memPtr,
