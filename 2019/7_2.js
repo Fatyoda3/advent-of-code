@@ -18,6 +18,7 @@ const INPUT_INSTRUCTION = {
 
   jump: (IP) => IP + 2
 };
+
 const OUTPUT = {
 
   operation: (tape, memoryAddressToRead, inputObj, output) => {
@@ -48,10 +49,12 @@ const getParams = (paramModes, memPtr, memory) => {
   return paramModes
     .map((mode, index) => MODE_BIT[mode](memPtr + index + 1, memory));
 };
+
 const formatInstruction = (memory, memPtr) => {
   const instruction = `${memory[memPtr]}`.padStart(5, '0');
   return instruction;
 };
+
 const getParamsAndOpcode = (memory, memPtr) => {
   const [p3Mod, p2Mod, p1Mod, ...code] = formatInstruction(memory, memPtr);
   const [p1, p2, p3] = getParams([p1Mod, p2Mod, p3Mod], memPtr, memory);
@@ -76,13 +79,13 @@ const computer = (amp) => {
 
 const inputCombos = permutations;
 
-const thrustValues = [];
-const createAmplifier = (memory, initialInputs) => ({
+
+const createAmplifier = (memory, initialInput) => ({
   memory: [...memory],
   output: [],
   ptr: 0,
   inputObj: {
-    inputs: [initialInputs],
+    inputs: [initialInput],
     ptr: 0,
   }
 });
@@ -92,11 +95,12 @@ const createAmplifiers = (initialInputs, memory) => {
     createAmplifier(memory, initialInput));
 };
 
+const thrustValues = [];
+
 for (const combo of inputCombos) {
   const amplifiers = createAmplifiers(combo, tape);
 
   amplifiers[0].inputObj.inputs.push(0);//initialize the first object to take second input as 0
-
 
   for (let ampIndex = 0; ampIndex < amplifiers.length; ampIndex++) {
     const amp = amplifiers[ampIndex];
