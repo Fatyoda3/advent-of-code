@@ -83,18 +83,24 @@ const createAmplifier = (memory, initialInputs, index) => {
     output: [],
     ptr: 0,
     inputObj: {
-      inputs: [initialInputs[index]],
+      inputs: [initialInputs/* [index] */],
       ptr: 0,
     }
   };
 };
 const createAmplifiers = (initialInputs, memory) => {
   const amplifiers = [];
-
-  for (let index = 0; index < initialInputs.length; index++) {
-    const obj = createAmplifier(memory, initialInputs, index);
+  for (const initialInput of initialInputs) {
+    const obj = createAmplifier(memory, initialInput);
     amplifiers.push(obj);
-  };
+  }
+
+  // for (let index = 0; index < initialInputs.length; index++) {
+  //   const obj = createAmplifier(memory, initialInputs, index);
+
+  //   amplifiers.push(obj);
+  // };
+
   return amplifiers;
 };
 
