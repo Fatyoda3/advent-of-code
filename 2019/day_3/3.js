@@ -9,7 +9,6 @@ const deltas = {
 const operations = (path) => path.map(([heading, ...rest]) => ({
   heading,
   val: parseInt(rest.join(''))
-
 }));
 
 const path1 = 'R75,D30,R83,U83,L12,D49,R71,U7,L72'.split(',');
@@ -25,8 +24,6 @@ function traceSteps(path, wire) {
 
   for (const { heading, val } of performed) {
     for (let index = 0; index < val; index++) {
-      // const { x0, y0 } = wire;
-      // const { x, y } = deltas[heading](x0, y0);
 
       posTaken.push({ ...wire, step });
       const { x, y } = deltas[heading];
@@ -46,29 +43,20 @@ const positionsTaken1 = traceSteps(path1, wire1);
 const positionsTaken2 = traceSteps(path2, wire2);
 
 function crosses(positionsTaken1, positionsTaken2) {
-  const intersects = [];
-
+  let minDistance = Infinity;
   for (let i = 1; i < positionsTaken1.length; i++) {
     for (let j = 1; j < positionsTaken2.length; j++) {
       if (positionsTaken1[i].x0 === positionsTaken2[j].x0 &&
         positionsTaken1[i].y0 === positionsTaken2[j].y0) {
-        intersects.push(positionsTaken1[i].step + positionsTaken2[j].step);
+        const current = positionsTaken1[i].step + positionsTaken2[j].step;
+        minDistance = Math.min(current, minDistance);
       }
     }
   }
+  console.log(minDistance);
 
-  return intersects;
 }
 
 const intersects = crosses(positionsTaken1, positionsTaken2);
 
-let distance = Infinity;
-for (let index = 0; index < intersects.length; index++) {
 
-  const d = intersects[index];
-  if (d < distance) {
-    distance = d;
-  }
-}
-
-console.log(distance);
