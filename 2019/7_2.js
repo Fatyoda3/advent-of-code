@@ -13,7 +13,6 @@ import { tape } from "./7_tape.js";
 const INPUT_INSTRUCTION = {
 
   operation: (memory, writeAddress, inputObj, output) => {
-
     memory[writeAddress] = inputObj.inputs[inputObj.ptr++];
   },
 
@@ -22,7 +21,6 @@ const INPUT_INSTRUCTION = {
 const OUTPUT = {
 
   operation: (tape, memoryAddressToRead, inputObj, output) => {
-
     output.push(tape[memoryAddressToRead]);
   },
 
@@ -80,8 +78,8 @@ const inputCombos = permutations;
 
 const thrustValues = [];
 
-const createObjectUsingInputs = (inputs, memory) => {
-  const objs = [];
+const createAmplifiers = (inputs, memory) => {
+  const amplifiers = [];
   for (let index = 0; index < inputs.length; index++) {
     const obj = {
       memory: [...memory],
@@ -92,28 +90,28 @@ const createObjectUsingInputs = (inputs, memory) => {
         ptr: 0,
       }
     };
-    objs.push(obj);
+    amplifiers.push(obj);
   }
-  return objs;
+  return amplifiers;
 };
 
 for (const combo of inputCombos) {
-  const newAmplifiers = createObjectUsingInputs(combo, tape);
+  const Amplifiers = createAmplifiers(combo, tape);
 
-  newAmplifiers[0].inputObj.inputs.push(0);
+  Amplifiers[0].inputObj.inputs.push(0);
 
 
-  for (let ampIndex = 0; ampIndex < newAmplifiers.length; ampIndex++) {
+  for (let ampIndex = 0; ampIndex < Amplifiers.length; ampIndex++) {
 
-    const amp = newAmplifiers[ampIndex];
+    const amp = Amplifiers[ampIndex];
     computer(amp);
 
     const outputs = amp.output;
 
-    newAmplifiers[(ampIndex + 1) % newAmplifiers.length].inputObj.inputs.push(outputs.at(-1));
+    Amplifiers[(ampIndex + 1) % Amplifiers.length].inputObj.inputs.push(outputs.at(-1));
 
   }
-  thrustValues.push(newAmplifiers.at(-1).output.at(-1));
+  thrustValues.push(Amplifiers.at(-1).output.at(-1));
 }
 
 const maxThrust = Math.max(...thrustValues);
