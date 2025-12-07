@@ -1,4 +1,4 @@
-import { permutations } from "./array.js";
+import { permutations } from "./7_1_array.js";
 const input_store = [];
 const cold_store = [];
 let writeCount = 1;

@@ -1,3 +1,4 @@
+import { permutations } from "./7_1_array.js";
 import {
   JUMP_IF_0,
   JUMP_IF_NOT_0,
@@ -7,45 +8,51 @@ import {
   MULTIPLY,
   HALT
 } from "./7_INS.js";
-const INPUTS = [];
-const cold_store = [];
+import { tape } from "./7_tape.js";
 
-let writeCount = 1;
-let cycleSecondInput = 0;
 
-const INPUT = {
-  operation: (tape, writeAddress, firstInput, remaining) => {
-    const input1 = firstInput.shift();
-    if (input1 !== undefined) {
-      tape[writeAddress] = input1;
-      INPUTS.push(tape[writeAddress]);
-      return;
-    }
-    if (cold_store.length === 1 && writeCount === 2) {
-      writeCount = 1;
-      const secondInput = cold_store.pop();
-      tape[writeAddress] = secondInput;
-      return;
-    }
+const INPUT_INSTRUCTION = {
 
-    tape[writeAddress] = remaining[cycleSecondInput++];
-    INPUTS.push(tape[writeAddress]);
-    writeCount += 1;
+  // operation: (tape, writeAddress, firstInput, remaining) => {
+  operation: (tape, writeAddress, inputObj, output) => {
+
+
+    tape[writeAddress] = inputObj.inputs[inputObj.ptr++];
+
+    // const input1 = firstInput.shift();
+    // if (input1 !== undefined) {
+    //   INPUTS.push(tape[writeAddress]);
+    //   return;
+    // }
+    // if (cold_store.length === 1 && writeCount === 2) {
+    //   writeCount = 1;
+    //   const secondInput = cold_store.pop();
+    //   tape[writeAddress] = secondInput;
+    //   return;
+    // }
+
+    // tape[writeAddress] = remaining[cycleSecondInput++];
+    // INPUTS.push(tape[writeAddress]);
+    // writeCount += 1;
 
   },
 
   jump: (IP) => IP + 2
 };
 const OUTPUT = {
-  operation: (tape, memoryAddressToRead) => {
-    cold_store.push(tape[memoryAddressToRead]);
+  operation: (tape, memoryAddressToRead, input, output) => {
+
+
+
+    output.push(tape[memoryAddressToRead]);
+
   },
 
   jump: (IP) => IP + 2
 };
 
 const INSTRUCTIONS = {
-  '03': INPUT,
+  '03': INPUT_INSTRUCTION,
   '04': OUTPUT,
 
   '01': ADD,
@@ -76,25 +83,33 @@ const getParamsAndOpcode = (memory, memPtr) => {
   return [p1, p2, p3, code.join("")];
 };
 
-const executeInstruction = (memPtr, memory, firstInput, remaining) => {
+const executeInstruction = (memPtr, memory, inputObj, output) => {
   const [p1, p2, p3, opcode] = getParamsAndOpcode(memory, memPtr);
-  const passInputs = opcode === '03' ? [firstInput, remaining] : [p2, p3];
+  const passInputs = ['03', "04"].includes(opcode) ? [inputObj, output] : [p2, p3];
+
 
   const skipJump = INSTRUCTIONS[opcode].operation(memory, p1, ...passInputs, memPtr);
 
   return skipJump || INSTRUCTIONS[opcode].jump(memPtr, memory);
 };
 
-const computer = (tape, firstInput, remaining) => {
-  let pointer = 0;
-  while (pointer < tape.length) {
-    pointer = executeInstruction(pointer, tape, firstInput, remaining);
+const computer = (amp) => {
+
+  while (amp.ptr < amp.memory.length) {
+
+
+    amp.ptr = executeInstruction(amp.ptr, amp.memory, amp.inputObj, amp.output);
   }
-  return tape;
+
+
 };
 
 const generatePartedInput = (inputSet) => [[inputSet[0], 0], inputSet.slice(1)];
-const inputCombos = [[4, 3, 2, 1, 0]];
+
+
+const inputCombos = permutations;
+
+
 
 const programData = [
   3, 15, 3, 16,
@@ -103,23 +118,46 @@ const programData = [
   15, 15, 4,
   15, 99, 0, 0];
 const thrustValues = [];
+// let halt = 0;
+const createObjectUsingInputs = (inputs, memory) => {
+  const objs = [];
+  for (let index = 0; index < inputs.length; index++) {
 
-for (let index = 0; index < inputCombos.length; index++) {
-  const [firstInput, remaining] = generatePartedInput(inputCombos[index]);
 
-  computer([...programData], firstInput, remaining);
-  computer([...programData], firstInput, remaining);
-  computer([...programData], firstInput, remaining);
-  computer([...programData], firstInput, remaining);
-  computer([...programData], firstInput, remaining);
+    const obj = {
+      memory: [...memory],
+      output: [],
+      ptr: 0,
+      inputObj: {
+        inputs: [inputs[index]],
+        ptr: 0,
+      }
+    };
+    objs.push(obj);
+  }
+  return objs;
+};
 
-  cycleSecondInput = 0;
-  thrustValues.push(cold_store.pop());
+for (const combo of inputCombos) {
+
+
+  const newAmplifiers = createObjectUsingInputs(combo, tape);
+
+  newAmplifiers[0].inputObj.inputs.push(0);
+
+
+  for (let ampIndex = 0; ampIndex < newAmplifiers.length; ampIndex++) {
+
+    const amp = newAmplifiers[ampIndex];
+    computer(amp);
+
+    const outputs = amp.output;
+
+    newAmplifiers[(ampIndex + 1) % newAmplifiers.length].inputObj.inputs.push(outputs.at(-1));
+
+  }
+  thrustValues.push(newAmplifiers.at(-1).output.at(-1));
 }
 
-const thrustNeeded = 43210;
 const maxThrust = Math.max(...thrustValues);
-
-console.log(
-  `Thrust should |${thrustNeeded}|-it\'s now|${maxThrust}|`
-  , thrustNeeded === maxThrust);
+console.log(maxThrust);
