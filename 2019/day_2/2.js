@@ -1,17 +1,16 @@
-// const TAPE = Deno.readTextFileSync('2.input').split(',').map(val => +val);
-// const TAPE = [1, 0, 0, 0, 99];
-const TAPE = [2, 3, 0, 3, 99];
-const TARGET = 19690720;
+import { program } from "./input.js";
 
 const INSTRUCTIONS = {
   1: {
     operation: (memory, p1, p2, memoryAddress) => {
       memory[memoryAddress] = memory[p1] + memory[p2];
+      return 4;
     }
   },
   2: {
     operation: (memory, p1, p2, memoryAddress) => {
-      memory[memoryAddress] = memory[p1] *  memory[p2];
+      memory[memoryAddress] = memory[p1] * memory[p2];
+      return 4;
     }
   }
 
@@ -22,11 +21,10 @@ const INSTRUCTIONS = {
 
 const executeInstruction = (memory, pointer) => {
   const [opcode, parameter1, parameter2, memoryAddress] = memory.slice(pointer, pointer + 4);
-  console.log({ opcode, parameter1, parameter2, memoryAddress });
 
-  INSTRUCTIONS[opcode].operation(memory, parameter1, parameter2, memoryAddress);
+  const jump = INSTRUCTIONS[opcode].operation(memory, parameter1, parameter2, memoryAddress);
 
-  return pointer + 4;
+  return pointer + jump;
 };
 
 const computer = (memory) => {
@@ -41,5 +39,12 @@ const computer = (memory) => {
   return memoryLocal;
 };
 
-const result = computer(TAPE);
-console.log(result);
+program[1] = 12;
+program[2] = 2;
+
+const result = computer(program);
+
+const TARGET_1 = 3765464;
+console.log(result[0] === TARGET_1, { resultValue: result[0], TARGET_1 });
+
+const TARGET_2 = 19690720;
