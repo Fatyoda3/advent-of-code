@@ -11,8 +11,7 @@ const operations = (path) => path.map(([heading, ...steps]) => ({
   val: parseInt(steps.join(''))
 }));
 
-
-function traceSteps(path, wire) {
+const traceSteps = (path, wire) => {
 
   const performed = operations(path);
   const posTaken = [];
@@ -34,9 +33,9 @@ function traceSteps(path, wire) {
 
   }
   return posTaken;
-}
+};
 
-function findMinimumSteps(path1, path2) {
+const findMinimumSteps = (path1, path2) => {
   let minimumSteps = Infinity;
 
   for (let i = 1; i < path1.length; i++) {
@@ -51,7 +50,7 @@ function findMinimumSteps(path1, path2) {
     }
   }
   return minimumSteps;
-}
+};
 
 function findMinimumDistance(path1, path2) {
   let minimumDistance = Infinity;
