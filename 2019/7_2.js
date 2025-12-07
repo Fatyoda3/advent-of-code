@@ -77,31 +77,19 @@ const computer = (amp) => {
 const inputCombos = permutations;
 
 const thrustValues = [];
-const createAmplifier = (memory, initialInputs, index) => {
-  return {
-    memory: [...memory],
-    output: [],
+const createAmplifier = (memory, initialInputs) => ({
+  memory: [...memory],
+  output: [],
+  ptr: 0,
+  inputObj: {
+    inputs: [initialInputs],
     ptr: 0,
-    inputObj: {
-      inputs: [initialInputs/* [index] */],
-      ptr: 0,
-    }
-  };
-};
-const createAmplifiers = (initialInputs, memory) => {
-  const amplifiers = [];
-  for (const initialInput of initialInputs) {
-    const obj = createAmplifier(memory, initialInput);
-    amplifiers.push(obj);
   }
+});
 
-  // for (let index = 0; index < initialInputs.length; index++) {
-  //   const obj = createAmplifier(memory, initialInputs, index);
-
-  //   amplifiers.push(obj);
-  // };
-
-  return amplifiers;
+const createAmplifiers = (initialInputs, memory) => {
+  return initialInputs.map((initialInput) =>
+    createAmplifier(memory, initialInput));
 };
 
 for (const combo of inputCombos) {
