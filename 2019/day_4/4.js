@@ -1,5 +1,6 @@
 const min = 234208;
 const max = 765869;
+
 const checkIfValid = (number) => {
   const str = `${number}`;
 
