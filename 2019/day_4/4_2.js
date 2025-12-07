@@ -1,3 +1,4 @@
+let exits = 0;
 const isPossiblePass = (password) => {
   const string = `${password}`;
   const formed = [];
@@ -14,6 +15,7 @@ const isPossiblePass = (password) => {
     let delta = 1;
 
     if (+(string[index]) > +(string[index - 1])) {
+
       formed.push(part);
       part = 1;
       delta = 0;
@@ -38,9 +40,6 @@ const findPossiblePasswordCount = (min, max) => {
   return passwordCount;
 };
 
-const check = 111122;
-
-console.log(isPossiblePass(check));
 
 const min = 234208;
 const max = 765869;
