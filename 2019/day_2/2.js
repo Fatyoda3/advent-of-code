@@ -32,7 +32,7 @@ const computer = (memory) => {
   const memoryLocal = [...memory];
   let pointer = 0;
 
-  while (memory[pointer] !== 99) {
+  while (memoryLocal[pointer] !== 99) {
     pointer = executeInstruction(memoryLocal, pointer);
   }
 
@@ -58,8 +58,8 @@ const part2 = () => {
       results.push(result[0]);
 
       if (result[0] === target) {
-        console.log(result[0] === target, { noun, verb, target });
-        return { noun, verb, target };
+      //   console.log(result[0] === target, { noun, verb, target });
+        return { noun, verb, target, results };
       }
 
       noun += 1;
@@ -69,18 +69,28 @@ const part2 = () => {
   }
 };
 const part1 = () => {
-  const copy1 = [...program];
+  const copy = [...program];
 
-  copy1[1] = 12;
-  copy1[2] = 2;
-  const result = computer([...copy1]);
+  copy[1] = 12;
+  copy[2] = 2;
+
+  const result = computer([...copy]);
   const target = 3765464;
+
   console.log(result[0] === target, { resultValue: result[0], target });
 };
 
 const main = () => {
-  part1();
-  const { verb, noun } = part2();
-  console.log(100 * noun + verb);
+  const results = part2();
+  console.log(results);
+  let isAscending = true;
+  for (let i = 1; i < results.length; i++) {
+    if (results[i] < results[i - 1]) {
+      isAscending = false;
+      return;
+    }
+  }
+  console.log({ isAscending });
+
 };
 main();

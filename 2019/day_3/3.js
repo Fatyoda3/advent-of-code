@@ -1,41 +1,38 @@
-// const input = Deno.readTextFileSync('3.input').split('\n');
-
+// const input = Deno.readTextFileSync('./day_3/3.input').split('\n');
 const deltas = {
-  R: (x, y) => ({ x: x + 1, y }),
-  L: (x, y) => ({ x: x - 1, y }),
-  U: (x, y) => ({ x, y: y + 1 }),
-  D: (x, y) => ({ x, y: y - 1 })
+  R: { x: 1, y: 0 },
+  L: { x: - 1, y: 0 },
+  U: { x: 0, y: 1 },
+  D: { x: 0, y: - 1 }
 };
 
-const operations = (path) => path.map((instruction) => ({
-  heading: instruction[0],
-  val: +(instruction.slice(1))
+const operations = (path) => path.map(([heading, ...rest]) => ({
+  heading,
+  val: parseInt(rest.join(''))
+
 }));
 
-// const [path1, path2] = input.map(value => value.split(','));
-// const path1 = 'R98,U47,R26,D63,R33,U87,L62,D20,R33,U53,R51'.split(',');
-// const path1 = 'R8,U5,L5,D3'.split(',');
-
-//
 const path1 = 'R75,D30,R83,U83,L12,D49,R71,U7,L72'.split(',');
 const path2 = 'U62,R66,U55,R34,D71,R55,D58,R83'.split(',');
+
 const wire1 = { x0: 0, y0: 0 };
-// const path2 = 'U7,R6,D4,L4'.split(',');
 const wire2 = { x0: 0, y0: 0 };
 
 function traceSteps(path, wire) {
   const performed = operations(path);
   const posTaken = [];
   let step = 0;
+
   for (const { heading, val } of performed) {
     for (let index = 0; index < val; index++) {
-      const { x0, y0 } = wire;
-      const { x, y } = deltas[heading](x0, y0);
+      // const { x0, y0 } = wire;
+      // const { x, y } = deltas[heading](x0, y0);
 
       posTaken.push({ ...wire, step });
+      const { x, y } = deltas[heading];
 
-      wire.x0 = x;
-      wire.y0 = y;
+      wire.x0 += x;
+      wire.y0 += y;
       step += 1;
 
     }
