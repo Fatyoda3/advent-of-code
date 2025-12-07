@@ -11,15 +11,17 @@ const operations = (path) => path.map(([heading, ...rest]) => ({
   val: parseInt(rest.join(''))
 }));
 
-const path1 = 'R75,D30,R83,U83,L12,D49,R71,U7,L72'.split(',');
-const path2 = 'U62,R66,U55,R34,D71,R55,D58,R83'.split(',');
+const steps1 = 'R75,D30,R83,U83,L12,D49,R71,U7,L72'.split(',');
+const steps2 = 'U62,R66,U55,R34,D71,R55,D58,R83'.split(',');
 
 const wire1 = { x: 0, y: 0 };
 const wire2 = { x: 0, y: 0 };
 
 function traceSteps(path, wire) {
+
   const performed = operations(path);
   const posTaken = [];
+
   let step = 0;
 
   for (const { heading, val } of performed) {
@@ -40,22 +42,29 @@ function traceSteps(path, wire) {
   return posTaken;
 }
 
-const positionsTaken1 = traceSteps(path1, wire1);
-const positionsTaken2 = traceSteps(path2, wire2);
+function crosses(path1, path2) {
+  let minimumSteps = Infinity;
 
-function crosses(positionsTaken1, positionsTaken2) {
-  let minDistance = Infinity;
-  for (let i = 1; i < positionsTaken1.length; i++) {
-    for (let j = 1; j < positionsTaken2.length; j++) {
-      if (positionsTaken1[i].x === positionsTaken2[j].x&&
-        positionsTaken1[i].y === positionsTaken2[j].y) {
-        const current = positionsTaken1[i].step + positionsTaken2[j].step;
-        minDistance = Math.min(current, minDistance);
+  for (let i = 1; i < path1.length; i++) {
+
+    for (let j = 1; j < path2.length; j++) {
+
+      if (path1[i].x === path2[j].x &&
+
+        path1[i].y === path2[j].y) {
+
+        const current = path1[i].step + path2[j].step;
+
+        minimumSteps = Math.min(current, minimumSteps);
+
       }
     }
   }
-  return minDistance;
+  return minimumSteps;
 }
 
-const minDistance = crosses(positionsTaken1, positionsTaken2);
-console.log({minDistance});
+const path1 = traceSteps(steps1, wire1);
+const path2 = traceSteps(steps2, wire2);
+
+const minDistance = crosses(path1, path2);
+console.log({ minDistance });
