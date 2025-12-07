@@ -1,4 +1,4 @@
-// const input = Deno.readTextFileSync('./day_3/3.input').split('\n');
+const input = Deno.readTextFileSync('./2019/day_3/3.input').split('\n');
 const deltas = {
   R: { dx: 1, dy: 0 },
   L: { dx: - 1, dy: 0 },
@@ -6,22 +6,22 @@ const deltas = {
   D: { dx: 0, dy: - 1 }
 };
 
-const operations = (path) => path.map(([heading, ...steps]) => ({
+const generateSteps = (path) => path.map(([heading, ...steps]) => ({
   heading,
   val: parseInt(steps.join(''))
 }));
 
 const traceSteps = (path, wire) => {
 
-  const performed = operations(path);
-  const posTaken = [];
+  const stepsToTake = generateSteps(path);
+  const positions = [];
 
   let step = 0;
 
-  for (const { heading, val } of performed) {
+  for (const { heading, val } of stepsToTake) {
     for (let index = 0; index < val; index++) {
 
-      posTaken.push({ ...wire, step });
+      positions.push({ ...wire, step });
       const { dx, dy } = deltas[heading];
 
       wire.x += dx;
@@ -29,10 +29,10 @@ const traceSteps = (path, wire) => {
 
       step += 1;
     }
-    posTaken.push({ ...wire });
+    positions.push({ ...wire });
 
   }
-  return posTaken;
+  return positions;
 };
 
 const findMinimumSteps = (path1, path2) => {
@@ -68,8 +68,8 @@ function findMinimumDistance(path1, path2) {
   }
   return minimumDistance;
 }
-const steps1 = 'R75,D30,R83,U83,L12,D49,R71,U7,L72'.split(',');
-const steps2 = 'U62,R66,U55,R34,D71,R55,D58,R83'.split(',');
+const steps1 = input[0].split(',')/* 'R75,D30,R83,U83,L12,D49,R71,U7,L72'.split(',') */;
+const steps2 = input[1].split(',')/* 'U62,R66,U55,R34,D71,R55,D58,R83'.split(',') */;
 
 const wire1 = { x: 0, y: 0 };
 const wire2 = { x: 0, y: 0 };
