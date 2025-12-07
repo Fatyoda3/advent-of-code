@@ -5,6 +5,7 @@ const pathMap = Deno.readTextFileSync('6.input')
   .split('\n')
   .map((value) => value.split(')'));
 //442
+
 const map = {};
 function mapOrbiters() {
 
@@ -52,9 +53,9 @@ const main = () => {
     if (hasChild(map, key, 'SAN') && hasChild(map, key, 'YOU')) {
       const distanceBetween = traverseOrbiters(key, 'SAN');
       const distanceBetween2 = traverseOrbiters(key, 'YOU');
-     
+
       const totalDistance = distanceBetween + distanceBetween2;
-     
+
       if (min > totalDistance) {
         min = totalDistance;
       }
