@@ -1,4 +1,6 @@
 import { program } from "./input.js";
+const NOUN_ADDRESS = 1;
+const VERB_ADDRESS = 2;
 
 const INSTRUCTIONS = {
   1: {
@@ -13,7 +15,6 @@ const INSTRUCTIONS = {
       return 4;
     }
   }
-
 
 };
 
@@ -35,16 +36,51 @@ const computer = (memory) => {
     pointer = executeInstruction(memoryLocal, pointer);
   }
 
-  console.log('exited out!');
   return memoryLocal;
 };
 
-program[1] = 12;
-program[2] = 2;
+const part2 = () => {
+  const target = 19690720;
+  const results = [];
 
-const result = computer(program);
+  let verb = 0;
 
-const TARGET_1 = 3765464;
-console.log(result[0] === TARGET_1, { resultValue: result[0], TARGET_1 });
+  while (verb <= 99) {
+    let noun = 0;
 
-const TARGET_2 = 19690720;
+    while (noun <= 99) {
+      const copy = [...program];
+
+      copy[VERB_ADDRESS] = verb;
+      copy[NOUN_ADDRESS] = noun;
+
+      const result = computer(copy);
+      results.push(result[0]);
+
+      if (result[0] === target) {
+        console.log(result[0] === target, { noun, verb, target });
+        return { noun, verb, target };
+      }
+
+      noun += 1;
+    }
+    
+    verb += 1;
+  }
+};
+const part1 = () => {
+  const copy1 = [...program];
+
+  copy1[1] = 12;
+  copy1[2] = 2;
+  const result = computer([...copy1]);
+  const target = 3765464;
+  console.log(result[0] === target, { resultValue: result[0], target });
+};
+
+const main = () => {
+  part1();
+  const { verb, noun } = part2();
+  console.log(100 * noun + verb);
+};
+main();
