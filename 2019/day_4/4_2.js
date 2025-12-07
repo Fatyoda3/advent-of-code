@@ -1,21 +1,25 @@
-const min = 234208;
-const max = 765869;
-const check = 111122;
 const isPossiblePass = (password) => {
   const string = `${password}`;
   const formed = [];
+
   let part = 1;
 
-  for (let index = 1; index < string.length; index++) {
-    if (string[index - 1] === string[index]) {
-      part += 1;
-    } else if (+(string[index]) > +(string[index - 1])) {
-      formed.push(part);
-      part = 1;
-    } else {
+  for (let i = 1; i < string.length; i++) {
+    if (string[i - 1] > string[i]) {
       return false;
     }
+  }
 
+  for (let index = 1; index < string.length; index++) {
+    let delta = 1;
+
+    if (+(string[index]) > +(string[index - 1])) {
+      formed.push(part);
+      part = 1;
+      delta = 0;
+    }
+
+    part += delta;
   }
 
   formed.push(part);
@@ -33,7 +37,14 @@ const findPossiblePasswordCount = (min, max) => {
   }
   return passwordCount;
 };
+
+const check = 111122;
+
 console.log(isPossiblePass(check));
 
+const min = 234208;
+const max = 765869;
+
 const count = findPossiblePasswordCount(min, max);
+
 console.log({ count, needed: 814 });
