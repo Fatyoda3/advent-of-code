@@ -7,29 +7,34 @@ const pathMap = Deno.readTextFileSync('6.input')
 //442
 
 const map = {};
-function mapOrbiters() {
 
-  for (let index = 0; index < pathMap.length; index++) {
+const mapOrbiters = () => {
+  const map = {};
 
-    const [currentPlanet, orbiter] = pathMap[index];
+  for (const [planet, orbiter] of pathMap) {
 
-    if (map[currentPlanet] === undefined) {
-      map[currentPlanet] = { orbiters: [orbiter] };
-    } else {
-      map[currentPlanet].orbiters.push(orbiter);
+    if (map[planet] === undefined) {
+      map[planet] = { orbiters: [] };
     }
+
+    map[planet].orbiters.push(orbiter);
+
     if (map[orbiter] === undefined) {
       map[orbiter] = { orbiters: [] };
     }
+
   }
-}
+
+  return map;
+};
 
 const hasChild = (map, head, traverseTo) => {
   const children = map[head].orbiters;
+ 
   if (children.includes(traverseTo)) {
-
     return true;
   }
+  
   return children
     .some((each) => hasChild(map, each, traverseTo));
 };
@@ -38,6 +43,7 @@ const traverseOrbiters = (head, traverseTo) => {
   if (map[head].orbiters.includes(traverseTo)) {
     return 0;
   }
+
   const orbiter = map[head].orbiters
     .find(orbiter => hasChild(map, orbiter, traverseTo));
 
@@ -48,6 +54,7 @@ const main = () => {
   mapOrbiters();
 
   let min = Infinity;
+  
   for (const key in map) {
 
     if (hasChild(map, key, 'SAN') && hasChild(map, key, 'YOU')) {
@@ -63,9 +70,7 @@ const main = () => {
 
   }
 
-
   console.log(min);
-
 };
 
 main();
