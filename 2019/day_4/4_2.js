@@ -1,4 +1,3 @@
-let exits = 0;
 const isPossiblePass = (password) => {
   const string = `${password}`;
   const formed = [];

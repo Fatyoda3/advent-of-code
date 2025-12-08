@@ -1,147 +1,60 @@
-const input = Deno.readTextFileSync('5.input').split(',').map((val) => +val);
-const input_store = [];
-const cold_store = [];
+// const input = Deno.readTextFileSync('./2019/day_5/5.input').split(',').map((val) => +val);
+
 const INSTRUCTIONS = {
   '01': {
-    operation: (tape, p1Add, p2Add, p3Add) => {
-      const param1 = tape[p1Add];
-      const param2 = tape[p2Add];
-
-      tape[p3Add] = param1 + param2;
-    },
-    jump: (IP) => IP + 4
+    operation: (memory, p1, p2, memoryAddress) => {
+      memory[memoryAddress] = memory[p1] + memory[p2];
+      return 4;
+    }
   },
   '02': {
-    operation: (tape, p1Add, p2Add, p3Add) => {
-      const param1 = tape[p1Add];
-      const param2 = tape[p2Add];
-
-      tape[p3Add] = param1 * param2;
-    },
-    jump: (IP) => IP + 4
-  },
-  '03': {
-    operation: (tape, writeTo) => {
-      tape[writeTo] = +(prompt("enter the value to put at :" + writeTo));
-      input_store.push({
-        [writeTo]:
-          tape[writeTo]
-      });
-
-    },
-    jump: (IP) => IP + 2
-  },
-  '04': {
-    operation: (tape, memoryAddressToRead) => {
-      cold_store.push({
-        [memoryAddressToRead]: tape[memoryAddressToRead]
-      });
-      console.log('value read is : ');
-      console.log(tape[memoryAddressToRead]);
-    },
-
-    jump: (IP) => IP + 2
-
-  },
-
-  '08': /* equals operator */{
-    operation: (tape, p1Add, p2Add, p3Add) => {
-      if (tape[p1Add] === tape[p2Add]) {
-        tape[p3Add] = 1;
-      } else {
-        tape[p3Add] = 0;
-      }
-    },
-
-    jump: (IP) => IP + 4
-
-  },
-  '07': /* less than operator */{
-    operation: (tape, p1Add, p2Add, p3Add) => {
-      if (tape[p1Add] < tape[p2Add]) {
-        tape[p3Add] = 1;
-      } else {
-        tape[p3Add] = 0;
-      }
-    },
-
-    jump: (IP) => IP + 4
-
-  },
-
-  '05': /* jump if not-zero operator */{
-    operation: (tape, p1Add, p2Add, _) => {
-      if (tape[p1Add] !== 0) {
-        return tape[p2Add];
-      }
-    },
-    jump: (IP) => IP + 3
-
-  },
-  '06': /* jump if not-zero operator */{
-    operation: (tape, p1Add, p2Add, _) => {
-      if (tape[p1Add] === 0) {
-        return tape[p2Add];
-      }
-    },
-    jump: (IP) => IP + 3
-
-  },
-
-  '99': {
-    operation: () => { },
-    jump: (IP, tape) => IP + tape.length
+    operation: (memory, p1, p2, memoryAddress) => {
+      memory[memoryAddress] = memory[p1] * memory[p2];
+      return 4;
+    }
   }
 
-
 };
-const SWITCH_MODE = {
-  1: (_, memPtr) => memPtr,
-  0: (tape, value) => tape[value]
-};
-
-const readInstruction = (pointer, tape) => {
-  const ins = `${tape[pointer]}`.padStart(5, '0');
-
-  const [p3Mode, p2Mode, p1Mode, ...code] = [...ins];
-  const p1 = SWITCH_MODE[p1Mode](tape, pointer + 1);
-  const p2 = SWITCH_MODE[p2Mode](tape, pointer + 2);
-  const memoryToWriteAt = SWITCH_MODE[p3Mode](tape, pointer + 3);
-
-  const opcode = code.join("");
-
-  const skipJump = INSTRUCTIONS[opcode].operation(tape, p1, p2, memoryToWriteAt, pointer);
-  if (skipJump !== undefined) {
-    return skipJump;
-  }
-
-  return INSTRUCTIONS[opcode].jump(pointer, tape);
+const MODE = {
+  0: (memPtr, memory) => memory[memPtr],//indirect mode is 0 I hate it 
+  1: (memPtr) => memPtr,//direct mode is 1 I hate it even more
+  //were the creators stupid 0 should mean direct access what is wrong with them 
 };
 
-const computer = (tape) => {
+const getOpcodeAndParams = (memory, pointer) => {
+  const instruction = `${memory[pointer]}`.padStart(5, '0');
+  const [m1, m2, m3, ...code] = [...instruction];
+
+
+  const p1 = MODE[m1](pointer + 1, memory);
+  const p2 = MODE[m2](pointer + 2, memory);
+  const p3 = MODE[m3](pointer + 3, memory);
+
+  const opcode = code.join('');
+
+  return [p1, p2, p3, opcode];
+};
+const executeInstruction = (memory, pointer) => {
+  const [p1, p2, p3, opcode] = getOpcodeAndParams(memory, pointer);
+
+  const jump = INSTRUCTIONS[opcode].operation(memory, p1, p2, p3);
+
+  return pointer + jump;
+};
+
+const computer = (memory) => {
+  const memoryLocal = [...memory];
   let pointer = 0;
 
-  while (pointer < tape.length) {
-    pointer = readInstruction(pointer, tape);
+  while (memoryLocal[pointer] !== 99) {
+    pointer = executeInstruction(memoryLocal, pointer);
   }
 
-  return tape;
+  return memoryLocal;
 };
 
-// const tape1 = [1, 0, 0, 0, 99];
-// const tape2 = [1002, 4, 3, 4, 33];
-// const tape3 = [1, 9, 10, 3, 2, 3, 11, 0, 99, 30, 40, 50];
+// 0 indirect indirect access of value 
+// 1 immediate direct access of value 
 
-const tape = [1101, 100, -1, 4, 0];
-computer(tape);
-console.log(tape);
-
-// computer(tape1);
-// computer(tape2);
-// computer(tape3);
-// computer(input);
-// computer([3, 9, 7, 9, 10, 9, 4, 9, 99, - 1, 8]);
-// computer([3, 3, 1108, -1, 8, 3, 4, 3, 99]);
-// computer([3, 3, 1107, -1, 8, 3, 4, 3, 99]);
-// computer([3, 3, 1105, -1, 9, 1101, 0, 0, 12, 4, 12, 99, 1]);
-// computer([3, 12, 6, 12, 15, 1, 13, 14, 13, 4, 13, 99, -1, 0, 1, 9]);
+const program = [1002, 4, 3, 4, 33];
+console.log(computer(program));
