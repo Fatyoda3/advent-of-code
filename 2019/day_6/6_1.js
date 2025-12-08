@@ -1,56 +1,45 @@
-const pathMap = "COM)B,B)C,C)D,D)E,E)F,B)G,G)H,D)I,E)J,J)K,K)L"
-  .split(',')
-  .map(value => value.split(')'));
-// const pathMap = Deno.readTextFileSync('6.input')
-//   .split('\n')
-//   .map((value) => value.split(')'));
-const map = {};
-
-function mapOrbiters() {
-
-  for (let index = 0; index < pathMap.length; index++) {
-
-    const [currentPlanet, orbiter] = pathMap[index];
-
-    if (map[currentPlanet] === undefined) {
-      map[currentPlanet] = { orbiters: [orbiter] };
-
-    } else {
-      map[currentPlanet].orbiters.push(orbiter);
+const pathMap = "COM)B,B)C,C)D,D)E,E)F,B)G,G)H,D)I,E)J,J)K,K)L".split(',').map(pair => pair.split(')'));
+// 42
+const mapOrbiters = (pathMap) => {
+  const map = {};
+  for (const [planet, orbiter] of pathMap) {
+    if (map[planet] === undefined) {
+      map[planet] = [];
     }
+
+    map[planet].push(orbiter);
+
     if (map[orbiter] === undefined) {
-      map[orbiter] = { orbiters: [] };
+      map[orbiter] = [];
     }
   }
 
-}
+  return map;
+};
 
-const traverseOrbiters = (head = 'COM') => {
+const map = mapOrbiters(pathMap);
 
-  while (head !== undefined) {
-    const orbiters = map[head].orbiters;
+const wrapper = (map) => {
+  let count = 0;
 
-    if (orbiters.length === 0) {
-      return head;
+  const traverseOrbiters = (start ,map) => {
+    count += 1;
+
+    while (start !== undefined) {
+      start = traverseOrbiters(map[start], map);
     }
 
-    orbiters.forEach(orbiter => {
-      count += 1;
-      head = traverseOrbiters(orbiter);
-    });
+    return start;
+  };
 
-  }
-  return head;
-};
+  for (const planet in map) {
 
-let count = 0;
-const main = () => {
-  mapOrbiters();
-
-  for (const key in map) {
-    traverseOrbiters(key);
+    traverseOrbiters(planet, map);
   }
 
-  console.log({ count });
+  return count;
 };
-main();
+
+const count = wrapper(map);
+
+console.log({ count });
