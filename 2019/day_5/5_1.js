@@ -28,8 +28,10 @@ const INSTRUCTIONS = {
 
       return 2;
     }
+  },
+ 
+ 
 
-  }
 };
 const MODE = {
   "0": (memPtr, memory) => memory[memPtr],//indirect mode is 0 I hate it 
@@ -55,7 +57,7 @@ const executeInstruction = (memory, pointer, inputObject, output) => {
 
   const [p1, p2, memoryAddress, opcode] = getOpcodeAndParams(memory, pointer);
   const params = (['03', '04'].includes(opcode)) ? [inputObject, p1] : [p1, p2, memoryAddress];
-  const jump = INSTRUCTIONS[opcode].operation(memory, ...params, output);
+  const jump = INSTRUCTIONS[opcode].operation(memory, ...params, output, pointer);
 
   return pointer + jump;
 };
@@ -88,5 +90,5 @@ const computer = (memory) => {
 
 // const program = [1002, 4, 3, 4, 33];
 // const program = [1101, 100, -1, 4, 0];
-const program = input;
+// const program = input;
 computer(program);
