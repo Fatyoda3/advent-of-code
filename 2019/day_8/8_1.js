@@ -13,21 +13,23 @@ const display = [];
 const ROW_COUNT = 3/* 25 */;
 const COLUMN_COUNT = 2/* 6 */;
 
-
-
-let x = 0;
 const layersCount = image.length / (ROW_COUNT * COLUMN_COUNT);
 
 const showDisplay = () => {
-  console.log(display.map(layer => layer.map(line => line.join('')).join('\n')).join('\n'));
+  console.log(display.join('\n'));
 };
+
+let x = 0;
+
 const makeLine = () => {
+
   const line = [];
 
   for (let row = 0; row < ROW_COUNT; row++) {
     const pixelColor = parseInt(image[x++]);
     line.push(pixelColor);
   }
+
   return line;
 };
 
@@ -36,26 +38,37 @@ const plotPixels = () => {
     const layer = [];
 
     for (let cols = 0; cols < COLUMN_COUNT; cols++) {
-      layer.push(makeLine());
+      layer.push(...makeLine());
     }
 
     display.push(layer);
   }
 };
+
 plotPixels();
 
-
-const countZeroesInLine = (line) => {
-  return line.
-    reduce((count, pixel) => pixel === 0 ? count + 1 : count, 0);
+const countZeroesInLayer = (layer = []) => {
+  return layer.reduce((count, pixel) => pixel === 0 ? count + 1 : count, 0);
 };
 
-const countZeroes = (layer = []) => {
-  return layer.reduce((count, line) => count + countZeroesInLine(line), 0);
-};
+const leastZero = { zeroCount: Infinity, index: 0 };
 
-const leastZero = { zeroCount: 0, index: 0 };
+// console.log(display);
 
-console.log(display);
+const f = display.reduce((count21, layer, index) => {
+  const currentZeroCount = countZeroesInLayer(layer);
+
+  if (leastZero.zeroCount > currentZeroCount) {
+
+  }
+
+  return count21;
+},
+  {
+    one: 0,
+    two: 0
+  });
+
+console.log(f);
 
 showDisplay();
