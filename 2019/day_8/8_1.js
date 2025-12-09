@@ -1,44 +1,37 @@
 ///* 123456789012 */
 // 3 pixel x 2 pixel
 // ROW X COLUMN
-// import { image } from "./input.js";
+import { image } from "./input.js";
+// const ROW_COUNT = 25;
+// const COLUMN_COUNT = 6;
+
 /* 
 Layer 1: [[1,2,3]
          [4,5,6]]
 Layer 2: [[7,8,9]
          [0,1,2]]
 */
+
 const image = '123456789012';
-const display = [];
-const ROW_COUNT = 3/* 25 */;
-const COLUMN_COUNT = 2/* 6 */;
+const ROW_COUNT = 3;
+const COLUMN_COUNT = 2;
+
 
 const layersCount = image.length / (ROW_COUNT * COLUMN_COUNT);
 
-const showDisplay = () => {
+const showDisplay = (display) => {
   console.log(display.join('\n'));
 };
 
 let x = 0;
 
-const makeLine = () => {
-
-  const line = [];
-
-  for (let row = 0; row < ROW_COUNT; row++) {
-    const pixelColor = parseInt(image[x++]);
-    line.push(pixelColor);
-  }
-
-  return line;
-};
-
 const plotPixels = () => {
+  
   for (let index = 0; index < layersCount; index++) {
     const layer = [];
 
-    for (let cols = 0; cols < COLUMN_COUNT; cols++) {
-      layer.push(...makeLine());
+    for (let cols = 0; cols < (ROW_COUNT * COLUMN_COUNT); cols++) {
+      layer.push(parseInt(image[x++]));
     }
 
     display.push(layer);
@@ -71,6 +64,28 @@ const leastZero = display.reduce((leastZero, layer, index) => {
 
 
 
-console.log(leastZero);
+const { one, two } = display[leastZero.index].reduce((count2and1, current) => {
+  if (current === 2) count2and1.two += 1;
+  if (current === 1) count2and1.one += 1;
 
-showDisplay();
+  return count2and1;
+}, {
+  one: 0,
+  two: 0
+});
+const display = [];
+
+console.log(display);
+
+showDisplay(display);
+
+
+console.log({ one, two });
+
+console.log(one * two);
+
+/* 
+{ one: 14, two: 128 }
+1792
+
+*/
