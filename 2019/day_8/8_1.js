@@ -31,20 +31,19 @@ const makeLine = () => {
   return line;
 };
 
-for (let index = 0; index < layersCount; index++) {
-  const layer = [];
+const plotPixels = () => {
+  for (let index = 0; index < layersCount; index++) {
+    const layer = [];
 
-  for (let cols = 0; cols < COLUMN_COUNT; cols++) {
-    layer.push(makeLine());
+    for (let cols = 0; cols < COLUMN_COUNT; cols++) {
+      layer.push(makeLine());
+    }
+
+    display.push(layer);
   }
+};
+plotPixels();
 
-  display.push(layer);
-}
-
-const leastZero = { zeroCount: 0, index: 0 };
-
-
-console.log(display);
 
 const countZeroesInLine = (line) => {
   return line.
@@ -55,5 +54,8 @@ const countZeroes = (layer = []) => {
   return layer.reduce((count, line) => count + countZeroesInLine(line), 0);
 };
 
+const leastZero = { zeroCount: 0, index: 0 };
+
+console.log(display);
 
 showDisplay();
