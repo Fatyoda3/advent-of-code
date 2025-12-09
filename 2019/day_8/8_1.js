@@ -48,27 +48,29 @@ const plotPixels = () => {
 plotPixels();
 
 const countZeroesInLayer = (layer = []) => {
+
   return layer.reduce((count, pixel) => pixel === 0 ? count + 1 : count, 0);
 };
 
-const leastZero = { zeroCount: Infinity, index: 0 };
+const leastZero = display.reduce((leastZero, layer, index) => {
 
-// console.log(display);
-
-const f = display.reduce((count21, layer, index) => {
   const currentZeroCount = countZeroesInLayer(layer);
 
   if (leastZero.zeroCount > currentZeroCount) {
 
+    leastZero.zeroCount = currentZeroCount;
+    leastZero.index = index;
   }
 
-  return count21;
+  return leastZero;
 },
   {
-    one: 0,
-    two: 0
+    zeroCount: Infinity,
+    index: -1
   });
 
-console.log(f);
+
+
+console.log(leastZero);
 
 showDisplay();
