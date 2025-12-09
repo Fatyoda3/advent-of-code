@@ -1,13 +1,13 @@
-import { image } from "./input.js";
-const ROW_COUNT = 25;
-const COLUMN_COUNT = 6;
+// import { image } from "./input.js";
+// const ROW_COUNT = 25;
+// const COLUMN_COUNT = 6;
 
 
 const display = [];
 
-// const image = '0222112222120000';
-// const ROW_COUNT = 2;
-// const COLUMN_COUNT = 2;
+const image = '0222112222120000';
+const ROW_COUNT = 2;
+const COLUMN_COUNT = 2;
 
 const layersCount = image.length / (ROW_COUNT * COLUMN_COUNT);
 
@@ -40,28 +40,60 @@ const plotPixels = () => {
   }
 };
 
+
+
+
 plotPixels();
 
 showDisplay();
-console.log(display.length);
+console.log();
 
-display.map(line => console.log(line));
-console.log('\n\n another one ');
+// console.log(display.length);
 
-const findVisiblePixel = (display, row, buffer) => {
-  for (let cols = 0; cols < display[row].length; cols++) {
+// console.log(display);
 
-    const element = display[row][cols];
-    if (element !== 2) {
-      buffer.push(element);
-      return;
-    }
-  }
-};
+
+// console.log('\n\n another one ');
+
+// const findVisiblePixel = (display, row, buffer) => {
+//   for (let cols = 0; cols < display[row].length; cols++) {
+
+//     const element = display[row][cols];
+//     if (element !== 2) {
+//       buffer.push(element);
+//       return;
+//     }
+//   }
+// };
+// const buffer = [];
+
+// for (let row = 0; row < display.length; row++) {
+//   findVisiblePixel(display, row, buffer);
+// }
+
+// console.log(buffer);
 const buffer = [];
+for (let index = 0; index < display[0].length; index++) {
+  let j = 0;
+  while (display[j][index] === 2) {
+    j += 1;
+  }
 
-for (let row = 0; row < display.length; row++) {
-  findVisiblePixel(display, row, buffer);
+  buffer[index] = (display[j][index]);
+  console.log(display[j][index]);
 }
+console.log({ buffer });
 
-console.log(buffer);
+
+// layer 1
+// 2 2 1 2 2 2 2 
+// 2 2 1 2 2 2 2 
+
+// layer 2
+// 2 2 1 2 2 2 2 
+// 2 2 1 2 2 2 2 
+
+// layer 3
+// 0 0 1 0 1 0 0 
+// 0 0 1 0 0 1 0 
+

@@ -74,7 +74,6 @@ const leastZero = findLayerWithLeast0(display);
 
 const { '1': one, '2': two } = display[leastZero.index].reduce((count2and1, current) => {
   count2and1[current] += 1;
-  console.log(count2and1);
 
   return count2and1;
 }, {
