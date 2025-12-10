@@ -1,35 +1,53 @@
-const output = (instructions, program, MemoryAddress) => {
+const output = (instructions, program, MemoryAddress, param2Address, param3Address, pointer) => {
   instructions["04"].values = program[MemoryAddress];
+  // console.log({ MemoryAddress });
+  return { value: 'OUTPUT output', jump: pointer + 2 };
 };
 
-const input = (instructions, program, MemoryAddress) => {
+const input = (instructions, program, MemoryAddress, param2Address, param3Address, pointer) => {
   program[MemoryAddress] = instructions["03"].value;
+  return { value: 'INPUT input', jump: pointer + 2 };
 };
 
-const add = (_ins, program, param1Address, param2Address, writeTo) => {
+const add = (_ins, program, param1Address, param2Address, writeTo, pointer) => {
   program[writeTo] = (program[param1Address]) + (program[param2Address]);
+  return { value: 'OUTPUT ADD', jump: pointer + 4 };
 };
 
-const mul = (_ins, program, param1Address, param2Address, writeTo) => {
+const mul = (_ins, program, param1Address, param2Address, writeTo, pointer) => {
+  // console.log({ program, param1Address, param2Address, writeTo, });
   program[writeTo] = (program[param1Address]) * (program[param2Address]);
+  return { value: 'OUTPUT MULTIPLY', jump: pointer + 4 };
 };
 
-const halt = (instructions) => instructions['99'].halted = true;
-
-const jumpIfTrue = (instructions, program, param1Address, param2Address) => {
-  instructions["05"].offset = (program[param1Address]) !== 0 ? program[param2Address] - pointer : 3;
+const halt = (instructions, program, param1Address, param2Address, param3Address, pointer) => {
+  instructions['99'].halted = true;
+  return { value: 'OUTPUT halt', jump: pointer };
 };
 
-const jumpIfFalse = (instructions, program, param1Address, param2Address) => {
-  instructions["06"].offset = (program[param1Address]) === 0 ? program[param2Address] - pointer : 3;
+const jumpIfTrue = (instructions, program, param1Address, param2Address, param3Address, pointer) => {
+  // console.log({ value: 'OUTPUT ------ JUMP IF TRUE ', jump: pointer });
+  console.log(program[param1Address] !== 0, { param1Address, param2Address }, program[param2Address]);
+  const jump = program[param1Address] !== 0 ? program[param2Address] : pointer + 3;
+  return { jump, value: 'IF TRUE JUMP' };
 };
 
-const lessThan = (_ins, program, param1Address, param2Address, writeTo) => {
+const jumpIfFalse = (instructions, program, param1Address, param2Address, param3Address, pointer) => {
+  // console.log({ value: 'OUTPUT ------ JUMP IF FALSE ', jump: pointer });
+
+  const jump = program[param1Address] === 0 ? program[param2Address] : pointer + 3;
+  return { jump, value: 'IF FALSE JUMP' };
+
+};
+
+const lessThan = (_ins, program, param1Address, param2Address, writeTo, pointer) => {
   program[writeTo] = (program[param1Address] < program[param2Address]) ? 1 : 0;
+  return { value: 'OUTPUT less than ', jump: pointer + 4 };
 };
 
-const equals = (_ins, program, param1Address, param2Address, writeTo) => {
+const equals = (_ins, program, param1Address, param2Address, writeTo, pointer) => {
   program[writeTo] = (program[param1Address] === program[param2Address]) ? 1 : 0;
+  return { value: 'OUTPUT ---- EQUALS', jump: pointer + 4 };
 };
 
 const MODE = {
@@ -41,72 +59,80 @@ const MODE = {
 const checkValue = 11;
 
 const instructions = {
-  "01": { operation: add, offset: 4 },
-  "02": { operation: mul, offset: 4 },
-  "03": { operation: input, offset: 2, value: checkValue },
-  "04": { operation: output, offset: 2, values: 0 },
-  "05": { operation: jumpIfTrue, offset: 3 },
-  "06": { operation: jumpIfFalse, offset: 3 },
-  "07": { operation: lessThan, offset: 4 },
-  "08": { operation: equals, offset: 4 },
-  "99": { operation: halt, offset: 1, halted: false },
+  "01": { operation: add },
+  "02": { operation: mul },
+  "03": { operation: input, value: checkValue },
+  "04": { operation: output, values: 0 },
+  "05": { operation: jumpIfTrue },
+  "06": { operation: jumpIfFalse },
+  "07": { operation: lessThan },
+  "08": { operation: equals },
+  "99": { operation: halt, halted: false },
 };
 
 const getParameters = (instruction, program, pointer) => {
+  // console.log({ instruction });
+
   const params = instruction.slice(0, 3).split('').reverse();
+  // console.log({ params });
+
   return params.map((bit, offset) => MODE[bit](pointer, offset + 1, program));
 };
+
 const getOpcodeAndInstruction = (program, pointer) => {
+  // console.log('XAMP', { program, pointer });
+
   const instruction = `${program[pointer]}`.padStart(5, "0");
 
-  const opcode = instruction.slice(instruction.length - 2);
+  const opcode = instruction.slice(- 2);
+  // console.log('IN GET OPCODE AND INSTRUCTION ', { opcode, instruction });
 
   return [opcode, instruction];
 };
 
-let pointer = 0;
-const executeInstructions = (program) => {
+const executeInstruction = (program, pointer = 0) => {
 
-  pointer = 0;
-  instructions[99].halted = false;
+  const [opcode, instruction] = getOpcodeAndInstruction(program, pointer);
 
-  while (!instructions[99].halted) {
-    const [opcode, instruction] = getOpcodeAndInstruction(program, pointer);
+  const [param1Address, param2Address, param3Address] = getParameters(instruction, program, pointer);
 
-    const [param1Address, param2Address, param3Address] = getParameters(instruction, program, pointer);
-    instructions[opcode].operation(instructions, program, param1Address, param2Address, param3Address, pointer);
+  const { jump, value } = instructions[opcode].operation(instructions, program, param1Address, param2Address, param3Address, pointer);
+  console.log({ jump, value });
 
-    pointer += instructions[opcode].offset;
-  }
 
-  const outputValue = instructions["04"].values;
-  console.log({ outputValue });
-  console.log(program.slice(-6));
-
-  return pointer;
+  return jump;
 };
 
 const computer = (program) => {
+
+  // instructions[99].halted = false;
+
   let pointer = 0;
+  let f = 0;
+  while (program[pointer] !== 99) {
+    console.log(program[pointer], pointer);
 
-  while (notHalted) {
-    pointer = executeInstructions(program, pointer);
-  }
+    pointer = executeInstruction(program, pointer);
+    // if (f++ > 2) {
+    //   break;
+    // }
+  };
+  console.log(program);
 
-
+  return instructions["04"].values;
 };
-// const computer = (program) => {
-//   let pointer = 0;
-//   while(notHalted)
-//   pointer = executeInstructions();
-// };
 
-const program = [3, 21, 1008, 21, 8, 20, 1005, 20, 22, 107, 8, 21, 20,
+
+const program0 = [3, 21, 1008, 21, 8, 20, 1005, 20, 22, 107, 8, 21, 20,
   1006, 20, 31, 1106, 0, 36, 98, 0, 0, 1002, 21, 125, 20, 4, 20, 1105, 1,
   46, 104, 999, 1105, 1, 46, 1101, 1000, 1, 20, 4, 20, 1105, 1, 46, 98, 99];
 
-console.log('run 0 ', executeInstructions([1, 0, 0, 0, 99]));
+console.log('run 1 \n\n', computer([...program0]));
+// console.log('run 0 ', computer([1, 0, 0, 0, 99]));
 
-console.log('run 1 ', executeInstructions([...program]));
+// const program = [1, 0, 0, 5, 99, 4, 5, 1, 2];
+// const program2 = [1002, 1, 69, 5, 99, 4, 5, 1, 2];
 
-// console.log('run 2 ', executeInstructions([...program]));
+// console.log('run 1 \n\n', computer([...program]));
+// console.log('run 2 ', computer([...program2]));
+
