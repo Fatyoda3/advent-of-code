@@ -1,31 +1,27 @@
-const output = (instructions, program, pointer) => {
-  instructions["04"].values = program[pointer];
+const output = (instructions, program, MemoryAddress) => {
+  instructions["04"].values = program[MemoryAddress];
 };
 
-const input = (instructions, program, pointer) => {
-  program[pointer] = instructions["03"].value;
+const input = (instructions, program, MemoryAddress) => {
+  program[MemoryAddress] = instructions["03"].value;
 };
 
 const add = (_ins, program, param1Address, param2Address, writeTo) => {
   program[writeTo] = (program[param1Address]) + (program[param2Address]);
 };
 
-const mul = (_ins, array, param1Address, param2Address, writeTo) => {
-  array[writeTo] = (array[param1Address]) * (array[param2Address]);
+const mul = (_ins, program, param1Address, param2Address, writeTo) => {
+  program[writeTo] = (program[param1Address]) * (program[param2Address]);
 };
 
-const halt = (instructions) => instructions[99].halted = true;
+const halt = (instructions) => instructions['99'].halted = true;
 
 const jumpIfTrue = (instructions, program, param1Address, param2Address) => {
-  instructions["05"].offset = ((program[param1Address]) !== 0)
-    ? program[param2Address] - pointer
-    : 3;
+  instructions["05"].offset = (program[param1Address]) !== 0 ? program[param2Address] - pointer : 3;
 };
 
 const jumpIfFalse = (instructions, program, param1Address, param2Address) => {
-  instructions["06"].offset = ((program[param1Address]) === 0)
-    ? program[param2Address] - pointer
-    : 3;
+  instructions["06"].offset = (program[param1Address]) === 0 ? program[param2Address] - pointer : 3;
 };
 
 const lessThan = (_ins, program, param1Address, param2Address, writeTo) => {
@@ -42,7 +38,6 @@ const MODE = {
   1: { positionMode: false },
 };
 
-let pointer = 0;
 
 const getParameters = (instruction, program, pointer) => {
   const param1Address = (MODE[instruction[2]].positionMode)
@@ -71,6 +66,7 @@ const instructions = {
   "08": { operation: equals, offset: 4 },
   "99": { operation: halt, offset: 1, halted: false },
 };
+let pointer = 0;
 
 const executeInstructions = (program) => {
 
@@ -83,14 +79,15 @@ const executeInstructions = (program) => {
     const opcode = instruction.slice(instruction.length - 2);
 
     const [param1Address, param2Address, param3Address] = getParameters(instruction, program, pointer);
-    instructions[opcode].operation(instructions, program, param1Address, param2Address, param3Address);
+    instructions[opcode].operation(instructions, program, param1Address, param2Address, param3Address, pointer);
 
     pointer += instructions[opcode].offset;
   }
 
   const outputValue = instructions["04"].values;
+  console.log({ outputValue });
 
-  return outputValue;
+  return pointer;
 };
 
 const computer = (program) => {
