@@ -1,6 +1,5 @@
 const output = (instructions, program, MemoryAddress, param2Address, param3Address, pointer) => {
   instructions["04"].values = program[MemoryAddress];
-  // console.log({ MemoryAddress });
   return { value: 'OUTPUT output', jump: pointer + 2 };
 };
 
@@ -15,25 +14,23 @@ const add = (_ins, program, param1Address, param2Address, writeTo, pointer) => {
 };
 
 const mul = (_ins, program, param1Address, param2Address, writeTo, pointer) => {
-  // console.log({ program, param1Address, param2Address, writeTo, });
+  console.log({ param1Address, param2Address });
+
   program[writeTo] = (program[param1Address]) * (program[param2Address]);
   return { value: 'OUTPUT MULTIPLY', jump: pointer + 4 };
 };
 
 const halt = (instructions, program, param1Address, param2Address, param3Address, pointer) => {
-  instructions['99'].halted = true;
-  return { value: 'OUTPUT halt', jump: pointer };
+  // instructions['99'].halted = true;
+  // return { value: 'OUTPUT halt', jump: pointer };
 };
 
 const jumpIfTrue = (instructions, program, param1Address, param2Address, param3Address, pointer) => {
-  // console.log({ value: 'OUTPUT ------ JUMP IF TRUE ', jump: pointer });
-  console.log(program[param1Address] !== 0, { param1Address, param2Address }, program[param2Address]);
   const jump = program[param1Address] !== 0 ? program[param2Address] : pointer + 3;
   return { jump, value: 'IF TRUE JUMP' };
 };
 
 const jumpIfFalse = (instructions, program, param1Address, param2Address, param3Address, pointer) => {
-  // console.log({ value: 'OUTPUT ------ JUMP IF FALSE ', jump: pointer });
 
   const jump = program[param1Address] === 0 ? program[param2Address] : pointer + 3;
   return { jump, value: 'IF FALSE JUMP' };
@@ -56,7 +53,7 @@ const MODE = {
 };
 
 
-const checkValue = 11;
+const checkValue = 0;//if less than equal to or greater than
 
 const instructions = {
   "01": { operation: add },
@@ -71,68 +68,53 @@ const instructions = {
 };
 
 const getParameters = (instruction, program, pointer) => {
-  // console.log({ instruction });
-
   const params = instruction.slice(0, 3).split('').reverse();
-  // console.log({ params });
-
   return params.map((bit, offset) => MODE[bit](pointer, offset + 1, program));
 };
 
 const getOpcodeAndInstruction = (program, pointer) => {
-  // console.log('XAMP', { program, pointer });
-
   const instruction = `${program[pointer]}`.padStart(5, "0");
-
   const opcode = instruction.slice(- 2);
-  // console.log('IN GET OPCODE AND INSTRUCTION ', { opcode, instruction });
 
   return [opcode, instruction];
 };
 
 const executeInstruction = (program, pointer = 0) => {
-
   const [opcode, instruction] = getOpcodeAndInstruction(program, pointer);
-
   const [param1Address, param2Address, param3Address] = getParameters(instruction, program, pointer);
 
   const { jump, value } = instructions[opcode].operation(instructions, program, param1Address, param2Address, param3Address, pointer);
-  console.log({ jump, value });
-
 
   return jump;
 };
-
+let t = 0;
 const computer = (program) => {
-
-  // instructions[99].halted = false;
-
   let pointer = 0;
-  let f = 0;
   while (program[pointer] !== 99) {
-    console.log(program[pointer], pointer);
-
     pointer = executeInstruction(program, pointer);
-    // if (f++ > 2) {
-    //   break;
-    // }
   };
-  console.log(program);
+  if (t++ > 0)
+    console.log('IMP', program.slice(-10));
 
   return instructions["04"].values;
 };
-
 
 const program0 = [3, 21, 1008, 21, 8, 20, 1005, 20, 22, 107, 8, 21, 20,
   1006, 20, 31, 1106, 0, 36, 98, 0, 0, 1002, 21, 125, 20, 4, 20, 1105, 1,
   46, 104, 999, 1105, 1, 46, 1101, 1000, 1, 20, 4, 20, 1105, 1, 46, 98, 99];
 
-console.log('run 1 \n\n', computer([...program0]));
-// console.log('run 0 ', computer([1, 0, 0, 0, 99]));
+console.log('run ---> value for output instruction ', computer([...program0]));
 
-// const program = [1, 0, 0, 5, 99, 4, 5, 1, 2];
-// const program2 = [1002, 1, 69, 5, 99, 4, 5, 1, 2];
 
-// console.log('run 1 \n\n', computer([...program]));
-// console.log('run 2 ', computer([...program2]));
+console.log('run 0  FOR ADDITION');
+computer([1, 0, 0, 0, 99]);
 
+
+console.log('run 1 FOR ADDITION',);
+const program = [1, 0, 0, 5, 99, 4, 5, 1, 2];
+computer([...program]);
+
+console.log('run 2 FOR MULTIPLY IN ADDRESSING AND IMMEDIATE MODE',);
+const program2 = [1102, 3, 3, 5, 99, 4, 5, 1, 2];
+
+computer([...program2]);
