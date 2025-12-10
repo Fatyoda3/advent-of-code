@@ -33,17 +33,11 @@ const equals = (_ins, program, param1Address, param2Address, writeTo) => {
 };
 
 const MODE = {
-  0: (pointer, index, program) => program[pointer + index],
-  1: (pointer, index) => pointer + index,
+  0: (pointer, offset, program) => program[pointer + offset],
+  1: (pointer, offset) => pointer + offset,
 };
 
-const getParameters = (instruction = '', program, pointer) => {
 
-  const params = instruction.slice(0, 3).split('').reverse();
-
-  return params.map((bit, offset) => MODE[bit](pointer, offset + 1, program));
-
-};
 const checkValue = 11;
 
 const instructions = {
@@ -57,17 +51,27 @@ const instructions = {
   "08": { operation: equals, offset: 4 },
   "99": { operation: halt, offset: 1, halted: false },
 };
-let pointer = 0;
 
+const getParameters = (instruction, program, pointer) => {
+  const params = instruction.slice(0, 3).split('').reverse();
+  return params.map((bit, offset) => MODE[bit](pointer, offset + 1, program));
+};
+const getOpcodeAndInstruction = (program, pointer) => {
+  const instruction = `${program[pointer]}`.padStart(5, "0");
+
+  const opcode = instruction.slice(instruction.length - 2);
+
+  return [opcode, instruction];
+};
+
+let pointer = 0;
 const executeInstructions = (program) => {
 
   pointer = 0;
   instructions[99].halted = false;
 
   while (!instructions[99].halted) {
-    const instruction = `${program[pointer]}`.padStart(5, "0");
-
-    const opcode = instruction.slice(instruction.length - 2);
+    const [opcode, instruction] = getOpcodeAndInstruction(program, pointer);
 
     const [param1Address, param2Address, param3Address] = getParameters(instruction, program, pointer);
     instructions[opcode].operation(instructions, program, param1Address, param2Address, param3Address, pointer);
