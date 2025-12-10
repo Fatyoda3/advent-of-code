@@ -33,25 +33,23 @@ const equals = (_ins, program, param1Address, param2Address, writeTo) => {
 };
 
 const MODE = {
-  0: { positionMode: true },
-  1: { positionMode: false },
+  0: (pointer, index, program) => { return program[pointer + index]; },
+  1: (pointer, index) => { return pointer + index; },
 };
 
-const getParameters = (instruction, program, pointer) => {
-  console.log
-    (typeof instruction);
-  // return instruction
-  const param1Address = (MODE[instruction[2]].positionMode)
-    ? program[pointer + 1]
-    : pointer + 1;
+const getParameters = (instruction = '', program, pointer) => {
+  console.log(instruction);
+  // const [a, b, c, ...rest] = [...instruction];
+  // return [a, b, c].map((bit, index) =>
 
-  const param2Address = (MODE[instruction[1]].positionMode)
-    ? program[pointer + 2]
-    : pointer + 2;
+  //   MODE[bit]() ? program[pointer + index + 1] : pointer + index + 1);
+  // console.log(f);
 
-  const param3Address = (MODE[instruction[0]].positionMode)
-    ? program[pointer + 3]
-    : pointer + 3;
+  const param1Address = MODE[instruction[2]](pointer, 1, program);
+
+  const param2Address = MODE[instruction[1]](pointer, 2, program);
+
+  const param3Address = MODE[instruction[0]](pointer, 3, program);
 
   return [param1Address, param2Address, param3Address];
 };
@@ -88,6 +86,7 @@ const executeInstructions = (program) => {
 
   const outputValue = instructions["04"].values;
   console.log({ outputValue });
+  console.log(program.slice(-6));
 
   return pointer;
 };
@@ -115,4 +114,4 @@ console.log('run 0 ', executeInstructions([1, 0, 0, 0, 99]));
 
 console.log('run 1 ', executeInstructions([...program]));
 
-console.log('run 2 ', executeInstructions([...program]));
+// console.log('run 2 ', executeInstructions([...program]));
