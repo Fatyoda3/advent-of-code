@@ -37,23 +37,23 @@ const equals = (_ins, program, param1Address, param2Address, writeTo) => {
 };
 
 
-const modes = {
+const MODE = {
   0: { positionMode: true },
   1: { positionMode: false },
 };
 
 let pointer = 0;
 
-const getParameters = (instruction, program) => {
-  const param1Address = (modes[instruction[2]].positionMode)
+const getParameters = (instruction, program, pointer) => {
+  const param1Address = (MODE[instruction[2]].positionMode)
     ? program[pointer + 1]
     : pointer + 1;
 
-  const param2Address = (modes[instruction[1]].positionMode)
+  const param2Address = (MODE[instruction[1]].positionMode)
     ? program[pointer + 2]
     : pointer + 2;
 
-  const param3Address = (modes[instruction[0]].positionMode)
+  const param3Address = (MODE[instruction[0]].positionMode)
     ? program[pointer + 3]
     : pointer + 3;
   return [param1Address, param2Address, param3Address];
@@ -82,29 +82,38 @@ const executeInstructions = (program) => {
 
     const opcode = instruction.slice(instruction.length - 2);
 
-    const [param1Address, param2Address, param3Address] = getParameters(instruction, program);
+    const [param1Address, param2Address, param3Address] = getParameters(instruction, program, pointer);
     instructions[opcode].operation(instructions, program, param1Address, param2Address, param3Address);
 
     pointer += instructions[opcode].offset;
   }
+
   const outputValue = instructions["04"].values;
+
   return outputValue;
+};
+
+const computer = (program) => {
+  let pointer = 0;
+
+  while (notHalted) {
+    pointer = executeInstructions(program, pointer);
+  }
+
+
 };
 // const computer = (program) => {
 //   let pointer = 0;
 //   while(notHalted)
 //   pointer = executeInstructions();
 // };
-const amplifier = (progarm, input1, input2) => {
-  console.log(executeInstructions(progarm));
-};
 
 const program = [3, 21, 1008, 21, 8, 20, 1005, 20, 22, 107, 8, 21, 20,
   1006, 20, 31, 1106, 0, 36, 98, 0, 0, 1002, 21, 125, 20, 4, 20, 1105, 1,
-  46, 104, 999, 1105, 1, 46, 1101, 1000, 1, 20, 4, 20, 1105, 1, 46, 98, 99,];
+  46, 104, 999, 1105, 1, 46, 1101, 1000, 1, 20, 4, 20, 1105, 1, 46, 98, 99];
 
-console.log('run 1 ');
+console.log('run 0 ', executeInstructions([1, 0, 0, 0, 99]));
 
-amplifier([...program]);
-console.log('run 2 ');
-amplifier([...program]);
+console.log('run 1 ', executeInstructions([...program]));
+
+console.log('run 2 ', executeInstructions([...program]));
