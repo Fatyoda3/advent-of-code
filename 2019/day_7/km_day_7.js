@@ -33,25 +33,16 @@ const equals = (_ins, program, param1Address, param2Address, writeTo) => {
 };
 
 const MODE = {
-  0: (pointer, index, program) => { return program[pointer + index]; },
-  1: (pointer, index) => { return pointer + index; },
+  0: (pointer, index, program) => program[pointer + index],
+  1: (pointer, index) => pointer + index,
 };
 
 const getParameters = (instruction = '', program, pointer) => {
-  console.log(instruction);
-  // const [a, b, c, ...rest] = [...instruction];
-  // return [a, b, c].map((bit, index) =>
 
-  //   MODE[bit]() ? program[pointer + index + 1] : pointer + index + 1);
-  // console.log(f);
+  const params = instruction.slice(0, 3).split('').reverse();
 
-  const param1Address = MODE[instruction[2]](pointer, 1, program);
+  return params.map((bit, offset) => MODE[bit](pointer, offset + 1, program));
 
-  const param2Address = MODE[instruction[1]](pointer, 2, program);
-
-  const param3Address = MODE[instruction[0]](pointer, 3, program);
-
-  return [param1Address, param2Address, param3Address];
 };
 const checkValue = 11;
 
