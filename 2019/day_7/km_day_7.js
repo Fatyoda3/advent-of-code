@@ -1,44 +1,41 @@
-import { permutations } from "jsr:@std/collections";
-
-const output = (instructions, array, index) => {
-  instructions["04"].values = array[index];
+const output = (instructions, program, pointer) => {
+  instructions["04"].values = program[pointer];
 };
 
-const input = (instructions, array, index) => {
-  array[index] = instructions["03"].value;
+const input = (instructions, program, pointer) => {
+  program[pointer] = instructions["03"].value;
 };
 
-const add = (_ins, array, param1Address, param2Address, writeTo) => {
-  array[writeTo] = parseInt(array[param1Address]) +
-    parseInt(array[param2Address]);
+const add = (_ins, program, param1Address, param2Address, writeTo) => {
+  program[writeTo] = (program[param1Address]) + (program[param2Address]);
 };
 
 const mul = (_ins, array, param1Address, param2Address, writeTo) => {
-  array[writeTo] = parseInt(array[param1Address]) *
-    parseInt(array[param2Address]);
+  array[writeTo] = (array[param1Address]) * (array[param2Address]);
 };
 
 const halt = (instructions) => instructions[99].halted = true;
 
-const jumpIfTrue = (instructions, array, input1, input2) => {
-  instructions["05"].offset = (parseInt(array[input1]) !== 0)
-    ? array[input2] - pointer
+const jumpIfTrue = (instructions, program, param1Address, param2Address) => {
+  instructions["05"].offset = ((program[param1Address]) !== 0)
+    ? program[param2Address] - pointer
     : 3;
 };
 
-const jumpIfFalse = (instructions, array, input1, input2) => {
-  instructions["06"].offset = (parseInt(array[input1]) === 0)
-    ? array[input2] - pointer
+const jumpIfFalse = (instructions, program, param1Address, param2Address) => {
+  instructions["06"].offset = ((program[param1Address]) === 0)
+    ? program[param2Address] - pointer
     : 3;
 };
 
-const lessThan = (_ins, array, input1, input2, writeTo) => {
-  array[writeTo] = (array[input1] < array[input2]) ? 1 : 0;
+const lessThan = (_ins, program, param1Address, param2Address, writeTo) => {
+  program[writeTo] = (program[param1Address] < program[param2Address]) ? 1 : 0;
 };
 
 const equals = (_ins, program, param1Address, param2Address, writeTo) => {
   program[writeTo] = (program[param1Address] === program[param2Address]) ? 1 : 0;
 };
+
 
 const modes = {
   0: { positionMode: true },
@@ -48,18 +45,18 @@ const modes = {
 let pointer = 0;
 
 const getParameters = (instruction, program) => {
-  const input1 = (modes[instruction[2]].positionMode)
+  const param1Address = (modes[instruction[2]].positionMode)
     ? program[pointer + 1]
     : pointer + 1;
 
-  const input2 = (modes[instruction[1]].positionMode)
+  const param2Address = (modes[instruction[1]].positionMode)
     ? program[pointer + 2]
     : pointer + 2;
 
-  const writeTo = (modes[instruction[0]].positionMode)
+  const param3Address = (modes[instruction[0]].positionMode)
     ? program[pointer + 3]
     : pointer + 3;
-  return [input1, input2, writeTo];
+  return [param1Address, param2Address, param3Address];
 };
 const checkValue = 11;
 
@@ -76,6 +73,7 @@ const instructions = {
 };
 
 const executeInstructions = (program) => {
+
   pointer = 0;
   instructions[99].halted = false;
 
@@ -84,14 +82,8 @@ const executeInstructions = (program) => {
 
     const opcode = instruction.slice(instruction.length - 2);
 
-    const [input1, input2, writeTo] = getParameters(instruction, program);
-    instructions[opcode].operation(
-      instructions,
-      program,
-      input1,
-      input2,
-      writeTo,
-    );
+    const [param1Address, param2Address, param3Address] = getParameters(instruction, program);
+    instructions[opcode].operation(instructions, program, param1Address, param2Address, param3Address);
 
     pointer += instructions[opcode].offset;
   }
