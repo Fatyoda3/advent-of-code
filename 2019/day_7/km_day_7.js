@@ -32,14 +32,15 @@ const equals = (_ins, program, param1Address, param2Address, writeTo) => {
   program[writeTo] = (program[param1Address] === program[param2Address]) ? 1 : 0;
 };
 
-
 const MODE = {
   0: { positionMode: true },
   1: { positionMode: false },
 };
 
-
 const getParameters = (instruction, program, pointer) => {
+  console.log
+    (typeof instruction);
+  // return instruction
   const param1Address = (MODE[instruction[2]].positionMode)
     ? program[pointer + 1]
     : pointer + 1;
@@ -51,6 +52,7 @@ const getParameters = (instruction, program, pointer) => {
   const param3Address = (MODE[instruction[0]].positionMode)
     ? program[pointer + 3]
     : pointer + 3;
+
   return [param1Address, param2Address, param3Address];
 };
 const checkValue = 11;
