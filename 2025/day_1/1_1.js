@@ -10,30 +10,8 @@ L99
 R14
 L82`};
 
-/* console.log(input.first.split('\n'));
-
 let dial = 50;
-
-const maxRotation = 99;
-
-const turn = (instruction, dial) => {
-  const { direction, turnAmount } = instruction;
-  let newDialValue = 0;
-
-  if (direction === 'L')
-    newDialValue = dial - turnAmount;
-  if (newDialValue < 0) {
-    newDialValue = 100 - newDialValue;
-  }
-  return newDialValue;
-};
-
-
-turn({ direction: 'L', turnAmount: 68 } , dial); */
-
-let dial = 50;
-
-const maxRotation = 99;
+const maxRotation = 99 + 1;
 
 const turn = (instruction, dial) => {
   const { direction, turnAmount } = instruction;
@@ -42,23 +20,24 @@ const turn = (instruction, dial) => {
   if (direction === 'L') {
     newDialValue = dial - turnAmount;
   }
-
   if (direction === 'R') {
     newDialValue = dial + turnAmount;
   }
-  console.log('dial value now ', dial, newDialValue);
 
   if (newDialValue < 0) {
-    console.log(newDialValue, 'dafja');
     newDialValue = 100 + newDialValue;
   }
-
-  console.log('now after ', newDialValue);
   return newDialValue;
-
 };
 
+const parseIns = (instruction) => {
+  const [direction, ...remaining] = [...instruction];
+  return { direction, turnAmount: parseInt(remaining.join('')) };
+};
 
-const first = turn({ direction: 'L', turnAmount: 68 }, dial);
-const second = turn({ direction: 'L', turnAmount: 30 }, first);
-turn({ direction: 'R', turnAmount: 48 }, second);
+input.first.split('\n').reduce((dial, currentTurnValue) => {
+  const values = parseIns(currentTurnValue);
+  dial = turn(values, dial);
+
+  return dial;
+}, 50);
