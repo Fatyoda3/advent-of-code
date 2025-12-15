@@ -90,5 +90,6 @@ const computer = (memory) => {
 
 // const program = [1002, 4, 3, 4, 33];
 // const program = [1101, 100, -1, 4, 0];
-// const program = input;
+const program = input;
+
 computer(program);

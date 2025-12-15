@@ -16,16 +16,16 @@ const INSTRUCTIONS = {
   },
 
   '03': {
-    operation: (pointer, memory, memoryAddress, inputObject) => {
+    operation: (pointer, memory, inputObject, memoryAddress) => {
 
-      memory[memoryAddress] = inputObject.inputArray[inputObject.pointer++];
+      memory[memoryAddress] = inputObject.inputArray[inputObject.inputPointer++];
 
       return 2 + pointer;
     }
   },
 
   '04': {
-    operation: (pointer, memory, memoryAddress, _, output) => {
+    operation: (pointer, memory, inputObject, memoryAddress, output) => {
       output.push(memory[memoryAddress]);
 
       return 2 + pointer;
@@ -64,10 +64,10 @@ const INSTRUCTIONS = {
   },
 
 };
+
 const MODE = {
-  "0": (memPtr, memory) => memory[memPtr], //indirect mode is 0 I hate it 
-  "1": (memPtr) => memPtr//direct mode is 1 I hate it even more
-  //were the creators stupid 0 should mean direct access what is wrong with them 
+  "0": (memPtr, memory) => memory[memPtr],
+  "1": (memPtr) => memPtr
 };
 
 const getOpcodeAndParams = (memory, pointer) => {
@@ -75,9 +75,9 @@ const getOpcodeAndParams = (memory, pointer) => {
 
   const [m3, m2, m1, ...code] = [...instruction];
 
-  const p1 = MODE[m1](pointer + 1, memory);//get first parameter
-  const p2 = MODE[m2](pointer + 2, memory);//get second parameter
-  const p3 = MODE[m3](pointer + 3, memory);//get third parameter (write address)
+  const p1 = MODE[m1](pointer + 1, memory);
+  const p2 = MODE[m2](pointer + 2, memory);
+  const p3 = MODE[m3](pointer + 3, memory);
 
   const opcode = code.join('');
 
@@ -86,40 +86,65 @@ const getOpcodeAndParams = (memory, pointer) => {
 
 const executeInstruction = (pointer, memory, inputObject, output) => {
   const [p1, p2, memoryAddress, opcode] = getOpcodeAndParams(memory, pointer);
-
-  const params = (['03', '04'].includes(opcode)) ? [p1, inputObject] : [p1, p2, memoryAddress];
-
+  const params = (['03', '04'].includes(opcode)) ? [inputObject, p1] : [p1, p2, memoryAddress];
   const jump = INSTRUCTIONS[opcode].operation(pointer, memory, ...params, output);
 
   return jump;
 };
 
-const generateBuffer = (value = 1) => {
-  const inputObject = {
-    inputArray: [value],
+const createAmplifier = (value) => {
+  return {
+    inputObject: {
+      inputArray: [value],
+      inputPointer: 0
+    },
+    output: [],
     pointer: 0
+
   };
-
-  const output = [];
-  return [inputObject, output];
-
+};
+const createAmplifiers = (initialInputs) => {
+  return initialInputs.map((initialInput) => createAmplifier(initialInput));
 };
 
-const computer = (memory) => {
+const computer = (memory, amplifier) => {
   const memoryLocal = [...memory];
-  let pointer = 0;
 
-  const [inputObject, output] = generateBuffer(5);
 
-  while (memoryLocal[pointer] !== 99) {
-    pointer = executeInstruction(pointer, memoryLocal, inputObject, output);
+  while (memoryLocal[amplifier.pointer] !== 99) {
+    if (amplifier.inputObject.inputArray.length < amplifier.inputObject.inputPointer) {
+      return;
+    }
+
+    amplifier.pointer = executeInstruction(amplifier.pointer, memoryLocal, amplifier.inputObject, amplifier.output);
   }
-  console.log(output);
 
-  return memoryLocal;
+  return amplifier.output;
 };
-//4,3,2,1,0
 
-const program = [3, 15, 3, 16, 1002, 16, 10, 16, 1, 16, 15, 15, 4, 15, 99, 0, 0];
+4, 3, 2, 1, 0;
+1; const program = [3, 15, 3, 16, 1002, 16, 10, 16, 1, 16, 15, 15, 4, 15, 99, 0, 0];
+1; const initialInputs = [4, 3, 2, 1, 0];
 
-computer(program);
+// 2; const program = [3, 23, 3, 24, 1002, 24, 10, 24, 1002, 23, -1, 23, 101, 5, 23, 23, 1, 24, 23, 23, 4, 23, 99, 0, 0];
+// 2; const initialInputs = [0, 1, 2, 3, 4];
+
+// 3; const program = [3, 31, 3, 32, 1002, 32, 10, 32, 1001, 31, -2, 31, 1007, 31, 0, 33,
+//   1002, 33, 7, 33, 1, 33, 31, 31, 1, 32, 31, 31, 4, 31, 99, 0, 0, 0];
+// 3; const initialInputs = [1, 0, 4, 3, 2];
+
+const amplifiers = createAmplifiers(initialInputs);
+
+amplifiers[0].inputObject.inputArray.push(0);
+
+while (amplifiers.at(-1)[amplifiers.at(-1).pointer] !== 99) {
+
+
+  for (let index = 0; index < amplifiers.length; index++) {
+    const output = computer([...program], amplifiers[index]);
+
+    amplifiers[(index + 1) % amplifiers.length].inputObject.inputArray.push(output.at(-1));
+  }
+}
+
+console.log('thrust generated ', amplifiers.at(-1).output);

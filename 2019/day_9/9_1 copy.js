@@ -29,7 +29,7 @@ const INSTRUCTIONS = {
 
   '04': {
     operation: (pointer, memory, inputObject, memoryAddress, output) => {
-      // console.log({ memoryAddress, pointer }, { lo: memory[pointer + 2] });
+      console.log({ memoryAddress, pointer }, { lo: memory[pointer + 2] });
 
       output.push(memory[memoryAddress]);
 
@@ -69,6 +69,7 @@ const INSTRUCTIONS = {
   },
   '09': {
     operation: (pointer, memory, p1, p2, p3) => {
+      console.log({p1});
       
       relativeBase += memory[p1];
 
@@ -104,7 +105,7 @@ const getOpcodeAndParams = (memory, pointer) => {
 };
 
 const handleOOR = (memory, value) => {
-  if (value < 0 || memory[value] === undefined) {
+  if (memory[value] < 0 || memory[value] === undefined) {
     return 0;
   }
 
@@ -113,13 +114,12 @@ const handleOOR = (memory, value) => {
 
 const executeInstruction = (pointer, memory, inputObject, output) => {
   let [p1, p2, memoryAddress, opcode] = getOpcodeAndParams(memory, pointer);
+  // p1 = handleOOR(memory, p1);
+  // p2 = handleOOR(memory, p2);
+  memoryAddress = handleOOR(memory, memoryAddress);
 
-  const newP1 = handleOOR(memory, p1);
-  p2 = handleOOR(memory, p2);
 
-
-  const params = (['03', '04'].includes(opcode)) ? [inputObject, p1] : [newP1, p2, memoryAddress];
-  
+  const params = (['03', '04'].includes(opcode)) ? [inputObject, p1] : [p1, p2, memoryAddress];
   const jump = INSTRUCTIONS[opcode].operation(pointer, memory, ...params, output);
 
   return jump;
@@ -158,8 +158,10 @@ const computer = (memory, amplifier) => {
 };
 
 
-const program = appleBanana;
-const amplifier = createDummy(2);
+// const program = appleBanana;
+const program = [1101, 100, -1, 4, 0];
+
+const amplifier = createDummy(1);
 
 const out = computer([...program], amplifier);
 

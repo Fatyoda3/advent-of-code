@@ -1,3 +1,5 @@
+const puzzle = Deno.readTextFileSync('./2025/day_1/input.txt').split('\n');
+
 const input = {
   first: `L68
 L30
@@ -8,11 +10,10 @@ L55
 L1
 L99
 R14
-L82`
-};
+L82`.split('\n'),
+  puzzle
 
-let dial = 50;
-const maxRotation = 99 + 1;
+};
 
 const turn = (instruction, dial) => {
   const { direction, turnAmount } = instruction;
@@ -28,11 +29,8 @@ const turn = (instruction, dial) => {
   if (newDialValue < 0) {
     newDialValue = 100 + newDialValue;
   }
-  if (newDialValue > 99) {
-    console.log({ newDialValue });
-    newDialValue = newDialValue - 100;
 
-  }
+  newDialValue = newDialValue % 100;
   return newDialValue;
 };
 
@@ -43,11 +41,15 @@ const parseIns = (instruction) => {
 
 let f = 0;
 
-input.first.split('\n').reduce((dial, currentTurnValue) => {
+input.puzzle.reduce((dial, currentTurnValue) => {
   const values = parseIns(currentTurnValue);
   dial = turn(values, dial);
-  console.log({ dial });
 
-  if (dial === 0) { f += 1; }
+  if (dial === 0) {
+    f += 1;
+  }
+
   return dial;
 }, 50);
+
+console.log(f);
