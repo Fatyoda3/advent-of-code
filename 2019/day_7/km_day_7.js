@@ -87,14 +87,13 @@ const executeInstruction = (program, pointer = 0) => {
 
   return jump;
 };
-let t = 0;
+
 const computer = (program) => {
   let pointer = 0;
+
   while (program[pointer] !== 99) {
     pointer = executeInstruction(program, pointer);
   };
-  if (t++ > 0)
-    console.log('IMP', program.slice(-10));
 
   return instructions["04"].values;
 };
