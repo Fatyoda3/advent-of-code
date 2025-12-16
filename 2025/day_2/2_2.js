@@ -10,7 +10,7 @@ const inputs = {
     "38593856-38593862",
     "565653-565659",
     "824824821-824824827",
-    "2121212118-2121212124"
+    "2121212118-2121212124",
   ].map(value => {
     const [min, max] = value.split('-'); return {
       min: parseInt(min),
@@ -56,27 +56,38 @@ const inputs = {
   ]
 };
 
-// const f = inputs.first[0];
-
-// console.log(f);
-
 let invalid = 0;
 let invalidIDsSum = 0;
 
+const invalidIDLog = [];
 const sumUp = () => {
 
-  for (const { min, max } of inputs.puzzle) {
+  for (const { min, max } of inputs.first) {
     for (let invalidID = min; invalidID <= max; invalidID++) {
-      const str = `${invalidID}`;
+        const str = `${invalidID}`;
+        const factors = primeFactors(str.length);
+        const chunks = [];
+        let last = 0;
+        for (const factor in factors) {
 
-      if (str.slice(0, str.length / 2) === str.slice(str.length / 2)) {
+          const t = str.length / factor;
+          chunks.push(str.slice(last, t));
+          last = t;
+          // invalid += 1;
+          // invalidIDsSum += invalidID;
 
-        invalid += 1;
-        invalidIDsSum += invalidID;
-
+        }
+      const isInvalid = chunks.reduce(({ bool, prev }, current) => bool = prev === current &&
+        { bool, prev },
+        {
+          bool: true,
+          prev: chunks[0]
+        });
+      if (isInvalid.bool) {
+        invalidIDLog.push(invalidID);
       }
     }
   }
 };
-
-console.log({ invalid, invalidIDsSum });
+sumUp();
+console.log({ invalid, invalidIDsSum, invalidIDLog });

@@ -15,8 +15,8 @@ const deliverPresents = (moves) => {
 
   for (const move of moves) {
     const [dx, dy] = heading[move];
-    const isVisited = visited.find(prev => current.x === prev.x && current.y === prev.y);
-    
+    const isVisited = visited.find(({ x, y }) => current.x === x && current.y === y);
+
     if (!isVisited) {
       visited.push({ ...current });
       count += 1;
@@ -29,10 +29,12 @@ const deliverPresents = (moves) => {
   return { count, visited };
 };
 
-// const { count , visited } = deliverPresents('>');
-// const { count, visited } = deliverPresents('^>v<');
-// const { count , visited } = deliverPresents('^v^v^v^v^v');
+const temp = ['>', '^>v<', '^v^v^v^v^v', puzzle];
+
+for (let i = 3; i <= 3; i++) {
+  const { count } = deliverPresents(temp[i]);
+  console.log({ count });
+}
 
 // 5000 upper bound 
-const { count, visited } = deliverPresents(puzzle);
-console.log({ count, visited });
+// const { count, visited } = deliverPresents(puzzle);
