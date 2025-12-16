@@ -1,23 +1,22 @@
 import { puzzle } from "./input.js";
 
 const hasConsecutivePairs = (letters) => {
-  for (let index = 0; index < letters.length ; index ++) {
+  const pairs = [];
+  for (let index = 0; index < letters.length - 1; index++) {
 
-    const matchPair = letters.slice(index, index + 2);
-    for (let j = index + 2; j < letters.length ; j ++) {
-      const comparator = letters.slice(j, j + 2);
-      console.log({ matchPair, comparator });
+    const currentPair = letters.slice(index, index + 2);
 
-      if (matchPair === comparator) {
-        return true;
-      }
+    if (pairs.includes(currentPair) && index -1 !== pairs.indexOf(currentPair)) {
+      return true;
     }
-  }
+
+    pairs.push(currentPair);
+  };
   return false;
 };
 
 const hasSandWich = (letters) => {
-  for (let index = 1; index < letters.length -1; index++) {
+  for (let index = 1; index < letters.length - 1; index++) {
     if (letters[index - 1] === letters[index + 1]) {
       return true;
     }
