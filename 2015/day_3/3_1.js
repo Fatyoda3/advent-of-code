@@ -1,5 +1,6 @@
 import { puzzle } from "./input.js";
 const [NORTH, SOUTH, EAST, WEST] = ['^', 'v', '>', '<'];
+
 const heading = {
   [NORTH]: [0, 1],
   [SOUTH]: [0, -1],
@@ -7,15 +8,16 @@ const heading = {
   [WEST]: [-1, 0],
 };
 
-const deliverPresents = (directions) => {
+const deliverPresents = (moves) => {
   const visited = [];
   const current = { x: 0, y: 0 };
   let count = 0;
 
-  for (const direction of directions) {
-    const [dx, dy] = heading[direction];
-
-    if (!(visited.find(prev => current.x === prev.x && current.y === prev.y))) {
+  for (const move of moves) {
+    const [dx, dy] = heading[move];
+    const isVisited = visited.find(prev => current.x === prev.x && current.y === prev.y);
+    
+    if (!isVisited) {
       visited.push({ ...current });
       count += 1;
     }
@@ -30,6 +32,7 @@ const deliverPresents = (directions) => {
 // const { count , visited } = deliverPresents('>');
 // const { count, visited } = deliverPresents('^>v<');
 // const { count , visited } = deliverPresents('^v^v^v^v^v');
-// const { count, visited } = deliverP   resents(puzzle);
-// console.log({ count, visited });
 
+// 5000 upper bound 
+const { count, visited } = deliverPresents(puzzle);
+console.log({ count, visited });
