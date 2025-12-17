@@ -1,25 +1,24 @@
 const puzzle = Deno.readTextFileSync('./day_2/input.txt');
 
-const inputs = [`1-3 a: abcde
+const inputs = [/* `1-3 a: abcde
 1-3 b: cdefg
-2-9 c: ccccccccc` /* ,
-  puzzle */];
+2-9 c: ccccccccc` , */
+  puzzle];
 
 const format = (input) => {
   return input.split('\n')
     .map(each => {
       const values = each.split(' ');
-      console.log({ input });
 
       return {
-        positions: values[0].split('-').map(vals => +vals),
+        positions: values[0].split('-').map(vals => (+vals) - 1),
         char: values[1][0],
         text: values[2]
       };
     });
 };
-const formatted = [];
 
+const formatted = [];
 for (const input of inputs) {
   const validate = format(input);
   formatted.push(...validate);
@@ -27,14 +26,13 @@ for (const input of inputs) {
 
 const isValid = (validate) => {
   const { positions, char, text } = validate;
-  console.log({ positions }, validate);
-
   const [first, nonMatching] = positions;
+  console.log({ first, nonMatching }, text[first], text[nonMatching]);
 
-  return text[first] === char && text[nonMatching] !== char;
+  console.log(char, text, text[first] === char, text[nonMatching] === char);
+
+  return (text[first] === char) !== (text[nonMatching] === char);
 };
-console.log(isValid(inputs[0]));
 
-// const vals = formatted.reduce((count, validate) => isValid(validate) ? count + 1 : count, 0);
-
-// console.log({ vals });
+const vals = formatted.reduce((count, validate) => isValid(validate) ? count + 1 : count, 0);
+console.log({ vals });
