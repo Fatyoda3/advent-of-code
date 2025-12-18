@@ -1,8 +1,8 @@
 const puzzle = Deno.readTextFileSync('./day_2/input.txt');
 
-const inputs = [/* `1-3 a: abcde
+const inputs = [`1-3 a: abcde
 1-3 b: cdefg
-2-9 c: ccccccccc` , */
+2-9 c: ccccccccc` ,
   puzzle];
 
 const format = (input) => {

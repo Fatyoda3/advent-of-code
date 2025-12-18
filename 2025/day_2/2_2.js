@@ -1,3 +1,19 @@
+import { chunk } from 'https://deno.land/std@0.224.0/collections/chunk.ts';
+const getFactors = (a) => {
+  const factors = [];
+  const number = a;
+
+  let divisor = 1;
+  while (number > divisor) {
+    if (number % divisor === 0) {
+      factors.push(divisor);
+    }
+    divisor += 1;
+  }
+
+  return factors;
+};
+
 const inputs = {
   first: [
     "11-22",
@@ -60,34 +76,30 @@ let invalid = 0;
 let invalidIDsSum = 0;
 
 const invalidIDLog = [];
+
 const sumUp = () => {
 
-  for (const { min, max } of inputs.first) {
+  for (const { min, max } of inputs.puzzle) {
+
     for (let invalidID = min; invalidID <= max; invalidID++) {
-        const str = `${invalidID}`;
-        const factors = primeFactors(str.length);
-        const chunks = [];
-        let last = 0;
-        for (const factor in factors) {
+      const str = `${invalidID}`;
+      const factors = getFactors(str.length);
 
-          const t = str.length / factor;
-          chunks.push(str.slice(last, t));
-          last = t;
-          // invalid += 1;
-          // invalidIDsSum += invalidID;
+      for (const factor of factors) {
 
-        }
-      const isInvalid = chunks.reduce(({ bool, prev }, current) => bool = prev === current &&
-        { bool, prev },
-        {
-          bool: true,
-          prev: chunks[0]
-        });
-      if (isInvalid.bool) {
-        invalidIDLog.push(invalidID);
+
+        const chunks = chunk([...str], factor).flatMap(each => each.join(''));
+
+        if (chunks.every((current) => current === chunks[0])) {
+          invalid += 1;
+          invalidIDsSum += invalidID;
+          // console.log({ chunks });
+          break;
+        };
       }
     }
   }
 };
 sumUp();
+
 console.log({ invalid, invalidIDsSum, invalidIDLog });

@@ -2,11 +2,11 @@ import { puzzle } from "./input.js";
 
 const hasConsecutivePairs = (letters) => {
   const pairs = [];
-  for (let index = 0; index < letters.length - 1; index++) {
 
+  for (let index = 0; index < letters.length - 1; index++) {
     const currentPair = letters.slice(index, index + 2);
 
-    if (pairs.includes(currentPair) && index -1 !== pairs.indexOf(currentPair)) {
+    if (pairs.includes(currentPair) && index - 1 !== pairs.indexOf(currentPair)) {
       return true;
     }
 
