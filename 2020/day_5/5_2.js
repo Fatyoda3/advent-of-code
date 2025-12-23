@@ -1,4 +1,4 @@
-const example = "FBFBBFFRLR";
+import { log } from "node:console";
 import { puzzle } from "./input.js";
 const binaryPartition = (lo, hi, instructions, [a, b]) => {
   let mid = Infinity;
@@ -23,18 +23,21 @@ const getSeatId = (values) => {
   return (row * 8 + column);
 };
 
-// console.log(getSeatId(example));
+// console.log(getSeatId("FBFBBFFRLR"));
 // console.log(getSeatId("BFFFBBFRRR"));
 // console.log(getSeatId("FFFBBBFRRR"));
 // console.log(getSeatId("BBFFBBFRLL"));
 
 const fn = (inputs) => {
-  return inputs.reduce((max, current) => {
-    const assumedMax = getSeatId(current);
-    // console.log({ assumedMax, current, row_col: getSeatId(current) });
+  const ids = inputs
+    .map((current) => getSeatId(current))
+    .sort((a, b) => a - b);
 
-    return Math.max(max, assumedMax);
-  }, -Infinity);
+  for (let i = 1; i < ids.length; i++) {
+    if (ids[i] - ids[i - 1] === 2) {
+      console.log(ids[i], ids[i - 1]);
+    }
+  }
 };
 
 console.log(fn(puzzle));
