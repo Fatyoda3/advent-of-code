@@ -42,7 +42,7 @@ const validateHeight = (height = "") => {
   return false;
 };
 
-const isValidHair = (value = "") => {
+const isValidHair = (value) => {
   const hex = /^#[\da-f]{6}$/;
   return hex.test(value);
 };
@@ -86,10 +86,3 @@ const count = parsePassports(puzzle).reduce((count, current) => {
 }, 0);
 
 console.log({ count });
-
-// const [one, two, three, four] = parsePassports(passports);
-// console.log(
-//   // { one /* , two, three, four */ },
-//   allFieldsPresent(one),
-//   validateFields(one),
-// );
