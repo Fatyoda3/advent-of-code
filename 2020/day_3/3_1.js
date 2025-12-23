@@ -7,20 +7,15 @@ let count = 0;
 while (input[row] != undefined) {
   let delta = 3;
   if (column + 3 === input[0].length - 1) {
-
     column += 3;
     const x = (input[0].length - 1) - column;
-     delta = x - 3;
+    delta = x - 3;
 
-    if (input[row][column] === '#') {
-      input[row][column] = 'X';
+    if (input[row][column] === "#") {
+      input[row][column] = "X";
       count += 1;
     }
-
   }
   column += delta;
-
 }
 console.log({ count });
-
-// console.log(input.map(row => row.join('')).join('\n'));
