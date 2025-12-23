@@ -1,4 +1,5 @@
 import { passports } from "./passports.js";
+// const puzzle = Deno.readTextFileSync("./2020/day_4/puzzle.txt");
 
 const parsePassports = (passports) => {
   return passports
@@ -6,7 +7,7 @@ const parsePassports = (passports) => {
     .map((fields) => fields.split("\n").join(" "));
 };
 
-const generatePassport = (fields) => {
+const genOnePassport = (fields) => {
   return fields.split(" ").reduce((passport, field) => {
     const [key, value] = field.split(":");
     passport[key] = value;
@@ -15,9 +16,24 @@ const generatePassport = (fields) => {
 };
 
 const generatePassports = (passports) => {
-  return parsePassports(passports).map(generatePassport);
+  return parsePassports(passports).map(genOnePassport);
 };
 
-const passportsFormatted = generatePassports(passports);
+const fieldsToValidate = [
+  "byr",
+  "iyr",
+  "eyr",
+  "hgt",
+  "hcl",
+  "ecl",
+  "pid",
+  // "cid",
+];
 
-console.log(passportsFormatted);
+const allFieldsPresent = (passport) => {
+  return fieldsToValidate
+    .every((field) => field in passport);
+};
+
+const [one, two, three, four] = generatePassports(passports);
+console.log({ one }, allFieldsPresent(one));
