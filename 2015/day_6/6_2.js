@@ -1,4 +1,6 @@
 import { puzzle } from "./puzzle.js";
+const XY_MATCH = /\d+,\d+/g;
+const INSTRUCTION_MATCH = /[a-z]+\s[a-z]*/g;
 
 const generateGrid = (gridSize) => {
   return Array.from(
@@ -7,12 +9,9 @@ const generateGrid = (gridSize) => {
   );
 };
 
-const extractDigits = /\d+,\d+/g;
-const findIns = /[a-z]+\s[a-z]*/g;
-
-const parseInput = (command = "") => {
-  const range = command.matchAll(extractDigits);
-  const ins = command.matchAll(findIns);
+const parseInput = (command) => {
+  const range = command.matchAll(XY_MATCH);
+  const ins = command.matchAll(INSTRUCTION_MATCH);
 
   const rangeFormatted = [...range]
     .map((digits) =>
@@ -29,16 +28,16 @@ const parseInput = (command = "") => {
   };
 };
 
-const turnOn = (_) => true;
-const turnOff = (_) => false;
-const toggle = (value) => !value;
+const increaseBy1 = (value) => value + 1;
+const decreaseBy1 = (value) => value > 0 ? value - 1 : value;
+const increaseBy2 = (value) => value + 2;
 
 const getFn = {
-  "turn on": turnOn,
-  "turn off": turnOff,
-  "toggle": toggle,
+  "turn on": increaseBy1,
+  "turn off": decreaseBy1,
+  "toggle": increaseBy2,
 };
-const performInstruction = (instruction, grid = [[]]) => {
+const performInstruction = (instruction, grid) => {
   const { range, command } = parseInput(instruction);
   const [from, to] = range;
   const [x0, y0] = from;
@@ -57,15 +56,16 @@ const main = () => {
   const DIMENSION = 1000;
   const grid = generateGrid(DIMENSION);
 
-  puzzle.forEach((ins) => performInstruction(ins, grid));
-  // const ins = "turn on 0,0 through 999,999";
-  // performInstruction(ins, grid);
+  puzzle
+    .forEach((ins) => performInstruction(ins, grid));
 
   const count = grid
-    .reduce((count, line) =>
-      count +
-      line
-        .reduce((acc, light) => light ? acc + 1 : acc, 0), 0);
+    .reduce(
+      (brightness, line) =>
+        brightness +
+        line.reduce((acc, light) => acc + light, 0),
+      0,
+    );
 
   console.log(count);
 };
