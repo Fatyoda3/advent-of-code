@@ -21,33 +21,31 @@ const parseInput = (command = "") => {
         .map((d) => +d)
     );
 
-  const insFormatted = [...ins].map((x) => x[0])[0];
+  const insFormatted = [...ins].map((x) => x[0])[0].trim();
 
   return {
     range: rangeFormatted,
     command: insFormatted,
   };
 };
+
 const turnOn = (_) => true;
 const turnOff = (_) => false;
 const toggle = (value) => !value;
+
+const getFn = {
+  "turn on": turnOn,
+  "turn off": turnOff,
+  "toggle": toggle,
+};
 const performInstruction = (instruction, grid = [[]]) => {
   const { range, command } = parseInput(instruction);
   const [from, to] = range;
   const [x0, y0] = from;
   const [x1, y1] = to;
 
-  console.log(from, to, command);
-  let fn = () => {};
-  if (command === "turn on") {
-    fn = turnOn;
-  }
-  if (command === "turn off") {
-    fn = turnOff;
-  }
-  if (command.includes("toggle")) {
-    fn = toggle;
-  }
+  const fn = getFn[command];
+
   for (let i = x0; i <= x1; i++) {
     for (let j = y0; j <= y1; j++) {
       grid[i][j] = fn(grid[i][j]);

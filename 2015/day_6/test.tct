@@ -1,0 +1,8 @@
+
+  // const ins = "turn on 0,0 through 999,999";
+  // const ins2 = "toggle 0,0 through 999,0";
+  // const ins3 = "turn off 499,499 through 500,500";
+
+  // performInstruction(ins, grid);
+  // performInstruction(ins2, grid);
+  // const x = performInstruction(ins3, grid);
