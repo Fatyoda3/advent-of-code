@@ -6,6 +6,7 @@
 //   "234234234234278",
 //   "818181911112111",
 // ];
+
 const batteryPack = Deno.readTextFileSync("./day_3/input.txt").split("\n");
 
 //15 -12 at most 3 digits --4
@@ -60,15 +61,19 @@ const maxJolt = (battery) => {
   while (highest.length !== required) {
     let max = -Infinity;
     const maxChecks = battery.length - (required - highest.length - 1);
+
     for (let i = idx; i < maxChecks; i++) {
       max = Math.max(max, +battery[i]);
     }
+
     idx = battery.indexOf(max + "", idx) + 1;
 
     highest.push(max);
   }
+
   return +(highest.join(""));
 };
 
 const x = batteryPack.reduce((sum, bP) => sum + maxJolt(bP), 0);
 console.log({ x });
+//172167155440541
